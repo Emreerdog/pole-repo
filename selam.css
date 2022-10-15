@@ -1,0 +1,31 @@
+html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+p{
+    font-family: sans-serif;
+    line-height: 1.2;
+}
+
+#contentContainer{
+    margin-right: 10px;
+    height: 90%;
+}
+
+#poleLogo{
+    width: 40px;
+    height: 50px;
+    margin-left: 50%;
+    margin-right: 50%;
+    border: none;
+}
+
+#contentPart{
+    padding: 20px;
+}
+
+#footerButtons{
+    margin-right: 10px;
+    background-color: rgb(199, 199, 199);
+}
