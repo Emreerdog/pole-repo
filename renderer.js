@@ -89,7 +89,7 @@ var page5 = "<h5>Repo URL</h5>"+
 "<p>Select Bigtop Repo URL:</p>"+
 "<br>"+
 "<label for='repoUrl'>Repo URL: </label>"+
-"<input type='text' id='repoUrl' name='repoUrl' class='w-100'>"
+"<input type='text' id='repoUrl' name='repoUrl' class='w-100' value='http://repos.bigtop.apache.org/releases/3.0.0/centos/7/x86_64'>"
 
 var page6 = "<h5>Install Path</h5>"+
 "<br>"+
@@ -106,12 +106,13 @@ var page6 = "<h5>Install Path</h5>"+
   "</div>"+
 "</div>"+
 "<div id='pathContainer'>"+
-  "<input type='text' class='w-100' id='pathInput0'>"+
+  "<input type='text' class='w-100' id='pathInput0' placeholder='/home/data/0'>"+
 "</div>"
 
 const pageArray = [page1, page2];
 var pageCounter = 0;
 var pathCounter = 1;
+var countpath=1;
 var domainCounter = 1;
 var inputDomains = new Array();
 var ourMasterNode;
@@ -147,8 +148,10 @@ function pathAddLogic()
     newChild.type = "text";
     newChild.className = "w-100";
     newChild.id = "pathInput" + pathCounter;
+    newChild.placeholder="/home/data/" + countpath;
     pathTextContainer.appendChild(newChild);
     pathCounter++;
+    countpath++;
 }
 
 function pathRemoveLogic()
