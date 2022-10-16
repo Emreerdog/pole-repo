@@ -13,7 +13,7 @@ var page1 = "<h5>Welcome To The Poleposition Installer</h5>" +
 var page2 = "<h5>Domain Selection</h5>"+
 "<br>"+
 "<small class='text-danger' id='logMessage'>*Domain fields can not be blank!</small>"+
-"<p>Select appropriate domains</p>"+
+"<p>Enter your domains</p>"+
 "<br>"+
 "<div>"+
   "<div class='row bg-dark w-100' id='addRemoveButtons'>"+
@@ -84,11 +84,38 @@ var page4 = "<h5>Bigtop Cluster Components</h5>"+
   "</div>"+
 "</div>"
 
+var page5 = "<h5>Repo URL</h5>"+
+"<br>"+
+"<p>Select Bigtop Repo URL:</p>"+
+"<br>"+
+"<label for='repoUrl'>Repo URL: </label>"+
+"<input type='text' id='repoUrl' name='repoUrl' class='w-100'>"
+
+var page6 = "<h5>Install Path</h5>"+
+"<br>"+
+"<p>Enter your installation paths:</p>"+
+"<br>"+
+"<div>"+
+  "<div class='row bg-dark w-100' id='pathAddRemove'>"+
+    "<div class='col-md-6'>"+
+      "<button type='button' class='btn btn-success' id='pathAddButton'>Add</button>"+
+    "</div>"+
+    "<div class='col-md-6'>"+
+      "<button type='button' class='btn btn-danger' id='pathRemoveButton'>Remove</button>"+
+    "</div>"+
+  "</div>"+
+"</div>"+
+"<div id='pathContainer'>"+
+  "<input type='text' class='w-100' id='pathInput0'>"+
+"</div>"
+
 const pageArray = [page1, page2];
 var pageCounter = 0;
+var pathCounter = 1;
 var domainCounter = 1;
 var inputDomains = new Array();
 var ourMasterNode;
+var ourRepoUrl;
 var bigtopComponents = new Array();
 
 const {NodeSSH} = require('node-ssh');
@@ -111,6 +138,28 @@ function removeDomainLogic(){
     var textContainerPart = document.getElementById("textContainer");
     textContainerPart.removeChild(textContainerPart.lastChild);
     domainCounter--;
+}
+
+function pathAddLogic()
+{
+    var pathTextContainer = document.getElementById("pathContainer");
+    var newChild = document.createElement("input");
+    newChild.type = "text";
+    newChild.className = "w-100";
+    newChild.id = "pathInput" + pathCounter;
+    pathTextContainer.appendChild(newChild);
+    pathCounter++;
+}
+
+function pathRemoveLogic()
+{   
+    if(pathCounter == 1)
+    {
+        return;
+    }
+    var pathTextContainer = document.getElementById("pathContainer");
+    pathTextContainer.removeChild(pathTextContainer.lastChild);
+    pathCounter--;
 }
 
 nextButton.addEventListener('click', () => {
@@ -197,25 +246,25 @@ nextButton.addEventListener('click', () => {
 
     if(pageCounter == 5)
     {
-        pageContent.innerHTML = "<div id='printBolgesi'></div>";
-        var printBolgesi = document.getElementById("printBolgesi");
+        pageContent.innerHTML = page5;
+    }
 
-        for(var i = 0; i < inputDomains.length; i++)
+    if(pageCounter == 6)
+    {
+        var repoUrlText = document.getElementById("repoUrl");
+        if(repoUrlText.value == "")
         {
-            var newParag = document.createElement("p");
-            newParag.innerHTML = inputDomains[i];
-            printBolgesi.appendChild(newParag);
+            // Repo url can not be empty
+            return;
         }
 
-        var masterParag = document.createElement("p");
-        masterParag.innerHTML = ourMasterNode;
-        printBolgesi.appendChild(masterParag);
-        for(var i = 0; i < bigtopComponents.length; i++)
-        {
-            var newParag = document.createElement("p");
-            newParag.innerHTML = bigtopComponents[i];
-            printBolgesi.appendChild(newParag);
-        }
+        ourRepoUrl = repoUrlText.value;
+        pageContent.innerHTML = page6;
+        var pathAddBut = document.getElementById("pathAddButton");
+        var pathRemoveBut = document.getElementById("pathRemoveButton");
+
+        pathAddBut.onclick = pathAddLogic;
+        pathRemoveBut.onclick = pathRemoveLogic;
     }
 
     pageCounter++;
