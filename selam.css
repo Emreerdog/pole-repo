@@ -29,3 +29,11 @@ p{
     margin-right: 10px;
     background-color: rgb(199, 199, 199);
 }
+
+#rmvButton{
+    float: right;
+}
+
+#logMessage{
+    display: none;
+}
