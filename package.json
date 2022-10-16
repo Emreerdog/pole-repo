@@ -17,6 +17,7 @@
   "dependencies": {
     "bootstrap": "^5.2.2",
     "bower": "^1.8.14",
+    "fs": "^0.0.1-security",
     "jquery": "^3.6.1",
     "node-ssh": "^13.0.0",
     "popper.js": "^1.16.1"

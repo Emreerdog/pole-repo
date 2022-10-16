@@ -11,29 +11,22 @@
     <script>require('bootstrap');</script>
     <script>let abc = require('node-ssh');</script>
 
-    <title>Hello World!</title>
+    <title>Poleposition Remote Installer</title>
   </head>
   <body>
     <div class="row" id="contentContainer">
-      <div class="col-md-4 bg-warning">
-        <img src="./icon.png" id="poleLogo">
+      <div class="col-md-4 bg-warning p-0">
+        <img src="./bearlogo.jpg" id="poleLogo">
 
       </div>
       <div class="col-md-8" id="contentPart">
-        <h5>Welcome To The Poleposition Installer</h5>
-        <br>
-        <p id="wowman">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse quis venenatis turpis. Donec ex erat, semper vel arcu ut, bibendum ultrices sem. Pellentesque sed venenatis nisl, sed placerat turpis. Fusce sed egestas magna, ut molestie magna</p>
-        <br>
-        <br>
-        <br>
-        <br>
-        <p>Press Next to continue...</p>
+
       </div>
     </div>
     <div class="d-flex flex-row-reverse" id="footerButtons">
       <div class="py-1">
-        <button type="button" class="px-3 btn btn-light btn-sm" id="nextButton">Next</button>
-        <button type="button" class="px-3 btn btn-light btn-sm">Exit</button>  
+        <button type="button" class="btn btn-dark btn-sm disabled" id="backButton">Back</button>  
+        <button type="button" class="btn btn-dark btn-sm" id="nextButton">Next</button> 
       </div>
     </div>
   </body>

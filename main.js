@@ -7,9 +7,10 @@ const createWindow = () => {
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
-      }
+      },
+      icon: './icon.png'
     })
-  
+    win.setResizable(false);
     win.loadFile('index.html');
     win.setMenu(null);
 }

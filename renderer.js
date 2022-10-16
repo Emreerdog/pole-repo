@@ -1,6 +1,10 @@
 const information = document.getElementById('wowman');
 const nextButton = document.getElementById('nextButton');
+const backButton = document.getElementById('backButton');
 const pageContent = document.getElementById('contentPart');
+
+var fs = require('fs');
+
 var x = 6;
 var domainInputCounter = 1;
 
@@ -12,21 +16,20 @@ var page1 = "<h5>Welcome To The Poleposition Installer</h5>" +
 
 var page2 = "<h5>Domain Selection</h5>"+
 "<br>"+
-"<small class='text-danger' id='logMessage'>*Domain fields can not be blank!</small>"+
+"<small class='text-danger' id='logMessage'>*Domain fields can not be blank</small>"+
 "<p>Enter your domains</p>"+
-"<br>"+
-"<div>"+
-  "<div class='row bg-dark w-100' id='addRemoveButtons'>"+
+"<div id='buttonsContainer'>"+
+  "<div class='row w-100' id='addRemoveButtons'>"+
     "<div class='col-md-6'>"+
-      "<button type='button' class='btn btn-success' id='domainAdd'>Add</button>"+
+      "<button type='button' class='btn btn-dark' id='domainAdd'><bold>+</bold></button>"+
     "</div>"+
     "<div class='col-md-6'>"+
-      "<button type='button' class='btn btn-danger' id='rmvButton'>Remove</button>"+
+      "<button type='button' class='btn btn-dark' id='rmvButton'><bold>-</bold></button>"+
     "</div>"+
   "</div>"+
 "</div>"+
-"<div id='textContainer' class='bg-danger'>"+
-  "<input type='text' class='w-100' id='domainInput0'>"+
+"<div id='textContainer'>"+
+  "<input type='text' class='w-100 mb-1' id='domainInput0'>"+
 "</div>";
 
 var page3 = "<h5>Master Node Selection</h5>"+
@@ -36,7 +39,7 @@ var page3 = "<h5>Master Node Selection</h5>"+
 "</select>";
 
 var page4 = "<h5>Bigtop Cluster Components</h5>"+
-"<p>Select your cluster components</p>"+
+"<small class='text-danger' id='logMessage'>*At least one cluster must be selected</small>"+
 "<div class='row'>"+
  "<div class='col-md-6'>"+
     "<input type='checkbox' id='comp0' name='comp0' value='alluxio'>"+
@@ -85,47 +88,80 @@ var page4 = "<h5>Bigtop Cluster Components</h5>"+
 "</div>"
 
 var page5 = "<h5>Repo URL</h5>"+
-"<br>"+
-"<p>Select Bigtop Repo URL:</p>"+
-"<br>"+
+"<small class='text-danger' id='logMessage'>*Repo field can not be blank</small>"+
+"<p>Enter Bigtop Repo URL:</p>"+
 "<label for='repoUrl'>Repo URL: </label>"+
 "<input type='text' id='repoUrl' name='repoUrl' class='w-100' value='http://repos.bigtop.apache.org/releases/3.0.0/centos/7/x86_64'>"
 
 var page6 = "<h5>Install Path</h5>"+
-"<br>"+
+"<small class='text-danger' id='logMessage'>*Installation paths must be supplied</small>"+
 "<p>Enter your installation paths:</p>"+
-"<br>"+
-"<div>"+
-  "<div class='row bg-dark w-100' id='pathAddRemove'>"+
+"<div id='buttonsContainer'>"+
+  "<div class='row w-100' id='addRemoveButtons'>"+
     "<div class='col-md-6'>"+
-      "<button type='button' class='btn btn-success' id='pathAddButton'>Add</button>"+
+      "<button type='button' class='btn btn-dark' id='pathAddButton'><bold>+</bold></button>"+
     "</div>"+
     "<div class='col-md-6'>"+
-      "<button type='button' class='btn btn-danger' id='pathRemoveButton'>Remove</button>"+
+      "<button type='button' class='btn btn-dark' id='pathRemoveButton'><bold>-</bold></button>"+
     "</div>"+
   "</div>"+
 "</div>"+
-"<div id='pathContainer'>"+
-  "<input type='text' class='w-100' id='pathInput0' placeholder='/home/data/0'>"+
+"<div id='textContainer'>"+
+  "<input type='text' class='w-100 mb-1' id='pathInput0' placeholder='/home/data/0'>"+
 "</div>"
 
-const pageArray = [page1, page2];
 var pageCounter = 0;
 var pathCounter = 1;
-var countpath=1;
+var countpath = 1;
 var domainCounter = 1;
+
 var inputDomains = new Array();
 var ourMasterNode;
-var ourRepoUrl;
+var ourRepoUrl = "";
 var bigtopComponents = new Array();
+var installationPaths = new Array();
 
 const {NodeSSH} = require('node-ssh');
+
+pageContent.innerHTML = page1;
+pageCounter++;
+
+function reloadDomains(){
+  backButton.className = "btn btn-dark btn-sm";
+  pageContent.innerHTML = page2;
+  var domainAddButton = document.getElementById("domainAdd");
+  var domainRemoveButton = document.getElementById("rmvButton");
+
+  domainAddButton.onclick = addDomainLogic;
+  domainRemoveButton.onclick = removeDomainLogic;
+  
+  domainCounter = 1;
+
+  if(inputDomains.length != 0)
+  {
+    var rawContainer = document.getElementById("textContainer");
+    var textContainerPart = rawContainer.children;
+    textContainerPart[0].value = inputDomains[0];
+    for(var i = 1; i < inputDomains.length; i++)
+    {
+      var newChild = document.createElement("input");
+      newChild.type = "text";
+      newChild.className = "w-100 mb-1";
+      newChild.id = "domainInput" + domainCounter;
+      newChild.value = inputDomains[i];
+      
+      rawContainer.appendChild(newChild);
+
+      domainCounter++;
+    }
+  }
+}
 
 function addDomainLogic(){
     var textContainerPart = document.getElementById("textContainer");
     var newChild = document.createElement("input");
     newChild.type = "text";
-    newChild.className = "w-100";
+    newChild.className = "w-100 mb-1";
     newChild.id = "domainInput" + domainCounter;
     textContainerPart.appendChild(newChild);
     domainCounter++;
@@ -137,18 +173,25 @@ function removeDomainLogic(){
         return;
     }
     var textContainerPart = document.getElementById("textContainer");
+    if(inputDomains.length != 0)
+    {
+      if(inputDomains[inputDomains.length - 1] == textContainerPart.lastChild.value)
+      {
+        inputDomains.pop();
+      }
+    }
     textContainerPart.removeChild(textContainerPart.lastChild);
     domainCounter--;
 }
 
 function pathAddLogic()
 {
-    var pathTextContainer = document.getElementById("pathContainer");
+    var pathTextContainer = document.getElementById("textContainer");
     var newChild = document.createElement("input");
     newChild.type = "text";
-    newChild.className = "w-100";
+    newChild.className = "w-100 mb-1";
     newChild.id = "pathInput" + pathCounter;
-    newChild.placeholder="/home/data/" + countpath;
+    newChild.placeholder = "/home/data/" + countpath;
     pathTextContainer.appendChild(newChild);
     pathCounter++;
     countpath++;
@@ -160,25 +203,44 @@ function pathRemoveLogic()
     {
         return;
     }
-    var pathTextContainer = document.getElementById("pathContainer");
+    var pathTextContainer = document.getElementById("textContainer");
     pathTextContainer.removeChild(pathTextContainer.lastChild);
     pathCounter--;
 }
 
 nextButton.addEventListener('click', () => {
-    
-    if(pageCounter == 0)
-    {
-        pageContent.innerHTML = page1;
-    }
 
-    else if(pageCounter == 1)
+    if(pageCounter == 1)
     {
+        backButton.className = "btn btn-dark btn-sm";
         pageContent.innerHTML = page2;
         var domainAddButton = document.getElementById("domainAdd");
         var domainRemoveButton = document.getElementById("rmvButton");
+      
         domainAddButton.onclick = addDomainLogic;
         domainRemoveButton.onclick = removeDomainLogic;
+        
+        domainCounter = 1;
+        if(inputDomains.length != 0)
+        {
+          var rawContainer = document.getElementById("textContainer");
+          var textContainerPart = rawContainer.children;
+          textContainerPart[0].value = inputDomains[0];
+          for(var i = 1; i < inputDomains.length; i++)
+          {
+            var newChild = document.createElement("input");
+            newChild.type = "text";
+            newChild.className = "w-100 mb-1";
+            newChild.id = "domainInput" + domainCounter;
+            newChild.value = inputDomains[i];
+            
+            rawContainer.appendChild(newChild);
+
+            domainCounter++;
+          }
+        }
+        pageCounter++;
+      
     }
     
     else if(pageCounter == 2){
@@ -186,7 +248,7 @@ nextButton.addEventListener('click', () => {
         var logMsg = document.getElementById("logMessage");
         var domainChild = textContainerPart.children;
         var ourChildLenght = domainChild.length;
-    
+
         for(var i = 0; i < domainChild.length; i++)
         {
             var currentChild = domainChild[i];
@@ -195,9 +257,17 @@ nextButton.addEventListener('click', () => {
                 logMsg.style.display = "block";
                 return;
             }
-            inputDomains.push(currentChild.value);
-        }
 
+            if(inputDomains.length > i)
+            {
+              inputDomains[i] = currentChild.value;
+            }
+            else
+            {
+              inputDomains.push(currentChild.value);
+            }
+        }
+        domainCounter = 1;
         pageContent.innerHTML = page3;
         var masterNodeSelector = document.getElementById("masterSelect");
         for(var i = 0; i < inputDomains.length; i++)
@@ -206,31 +276,22 @@ nextButton.addEventListener('click', () => {
             optionElement.innerHTML = inputDomains[i];
             masterNodeSelector.appendChild(optionElement);
         }
+        pageCounter++;
     }
 
-    if(pageCounter == 3)
+    else if(pageCounter == 3)
     {
         var masterNodeSelector = document.getElementById("masterSelect");
         ourMasterNode = masterNodeSelector.value;
-        pageContent.innerHTML = page4;
+        pageContent.innerHTML = page4; 
+        pageCounter++;
     }
 
-    if(pageCounter == 4)
+    else if(pageCounter == 4)
     {
-        
         var isElementSelected = false;
-
-        for(var i = 0; i < 10; i ++)
-        {
-            var inputElem = document.getElementById("comp"+i);
-            if(inputElem.checked == true)
-            {
-                bigtopComponents.push(inputElem.value);
-                isElementSelected = true;
-            }
-        }
-
-        for(var i = 10; i < 20; i++)
+        bigtopComponents = new Array();
+        for(var i = 0; i < 20; i++)
         {
             var inputElem = document.getElementById("comp"+i);
             if(inputElem.checked == true)
@@ -242,61 +303,180 @@ nextButton.addEventListener('click', () => {
 
         if(isElementSelected == false)
         {
+            var logMsg = document.getElementById("logMessage");
+            logMsg.style.display = "block";
             return;
+        }
+        pageContent.innerHTML = page5;
+        var repoUrlText = document.getElementById("repoUrl");
+        if(ourRepoUrl != "")
+        {
+          repoUrlText.value = ourRepoUrl;
         }
         pageCounter++;
     }
-
-    if(pageCounter == 5)
-    {
-        pageContent.innerHTML = page5;
-    }
-
-    if(pageCounter == 6)
-    {
+    else if(pageCounter == 5)
+    {   
         var repoUrlText = document.getElementById("repoUrl");
         if(repoUrlText.value == "")
         {
-            // Repo url can not be empty
-            return;
+          var logMsg = document.getElementById("logMessage");
+          logMsg.style.display = "block";
+          return;
         }
-
         ourRepoUrl = repoUrlText.value;
         pageContent.innerHTML = page6;
+        nextButton.innerHTML = "Install";
+        pathCounter = 1;
+
         var pathAddBut = document.getElementById("pathAddButton");
         var pathRemoveBut = document.getElementById("pathRemoveButton");
-
+        
         pathAddBut.onclick = pathAddLogic;
         pathRemoveBut.onclick = pathRemoveLogic;
+
+        
+        pageCounter++;
     }
 
-    pageCounter++;
+    else if(pageCounter == 6)
+    {
+        
+
+        var ourTextContainer = document.getElementById("textContainer");
+        var tempInstallPaths = ourTextContainer.children;
+        installationPaths = new Array();
+        for(var i = 0; i < tempInstallPaths.length; i++)
+        {
+          if(tempInstallPaths[i].value == "")
+          {
+            var logMsg = document.getElementById("logMessage");
+            logMsg.style.display = "block";
+            return;
+          }
+          installationPaths.push(tempInstallPaths[i].value);
+        }
+
+        var installTargets = "";
+        for(var i = 0; i < installationPaths.length; i++)
+        {
+          installTargets += "- " + installationPaths[i] + "\n";
+        }
+
+        var bigtopPart = "";
+        for(var i = 0; i < bigtopComponents.length; i++)
+        {
+          bigtopPart += "- " + bigtopComponents[i] + "\n";
+        }
+
+        var installerTemplate = "RED=\"\\033[0;31m\"; BLUE=\"\\033[0;34m\"; DEFAULTC=\"\\033[0m\""+
+        "printf \"\nWelcome to the BEARTELL ${RED}Bigtop${DEFAULTC} installer\n\n\""+
+        "# Install Dependencies\n"+
+        "sudo yum -y install git\n\n"+
+        "# Install Puppet\n" +
+        "sudo rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm\n"+
+        "sudo yum -y install puppet\n"+
+        "sudo /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib\n\n\n"+
+        "# Install Bigtop Puppet\n"+
+        "sudo git clone https://github.com/apache/bigtop.git /bigtop-home\n"+
+        "sudo sh -c \"cd /bigtop-home; git checkout release-3.0.0\"\n"+
+        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+        "sudo cp /bigtop-home/bigtop-deploy/puppet/hiera.yaml /etc/puppet/\n\n\n"+
+        "# Configure\n"+
+        "sudo su root -c \"cat > /etc/puppet/hieradata/site.yaml << EOF\n"+
+        "---\n"+
+        "bigtop::hadoop_head_node: \"" + ourMasterNode + "\"\n"+
+        "hadoop::hadoop_storage_dirs:\n" + installTargets + 
+        "hadoop_cluster_node::cluster_components:\n"+
+        bigtopPart+
+        "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
+        "bigtop::bigtop_repo_uri: " + "\"" + ourRepoUrl + "\"\n"+
+        "EOF\"\n\n\n"+
+        "# Deploy \n"+
+        "sudo /opt/puppetlabs/bin/puppet apply --parser future --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules /bigtop-home/bigtop-deploy/puppet/manifests"
+        ;
+        
+        console.log(installerTemplate);
+
+        // var repoUrlText = document.getElementById("repoUrl");
+        // if(repoUrlText.value == "")
+        // {
+        //     // Repo url can not be empty
+        //     var logMsg = document.getElementById("logMessage");
+        //     logMsg.style.display = "block";
+        //     return;
+        // }
+        // ourRepoUrl = repoUrlText.value;
+        
+       
+
+        // if(installPaths.length != 0)
+        // {
+        //   var pathContainer = document.getElementById("textContainer");
+        //   var childArmy = pathContainer.children;
+        //   childArmy[0].value = installPaths[0];
+        //   for(var i = 1; i < installPaths.length; i++)
+        //   {
+        //     var newBoy = document.createElement("input");
+        //     newBoy.type = "text";
+        //     newBoy.className = "w-100 mb-1";
+        //     newBoy.id = "pathInput" + pathCounter;
+        //     pathContainer.appendChild(newBoy);
+        //     pathCounter++;
+        //     countpath++;
+        //   }
+        // }
+    }
+
+    
 });
 
+backButton.addEventListener('click', () => {
+  if(pageCounter == 2){
+    // Means we were adding domains
+    backButton.className = "btn btn-dark btn-sm disabled";
+    pageContent.innerHTML = page1;
+  }
+  else if(pageCounter == 3){
+    // Means we were selecting master
+    ourMasterNode = "";
+    pageContent.innerHTML = page2;
+    reloadDomains();
+  }
 
+  else if(pageCounter == 4)
+  {
+    // Means we were selecting bigtop clusters
+    pageContent.innerHTML = page3;
+    var masterNodeSelector = document.getElementById("masterSelect");
+    for(var i = 0; i < inputDomains.length; i++)
+    {
+        var optionElement = document.createElement("option");
+        optionElement.innerHTML = inputDomains[i];
+        masterNodeSelector.appendChild(optionElement);
+    }
+  }
 
+  else if(pageCounter == 5){
+    // Means we were giving repo
+    
+    pageContent.innerHTML = page4; 
+  }
 
+  else if(pageCounter == 6)
+  {
+    // Means we were giving storage paths
+    pageContent.innerHTML = page5;
+    nextButton.innerHTML = "Next";
+    var repoUrlText = document.getElementById("repoUrl");
+    if(ourRepoUrl != "")
+    {
+      repoUrlText.value = ourRepoUrl;
+    }
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  pageCounter--;
+})
 
 // const password = '1234'
 //     const ssh = new NodeSSH();

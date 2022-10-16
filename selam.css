@@ -14,26 +14,51 @@ p{
 }
 
 #poleLogo{
-    width: 40px;
-    height: 50px;
-    margin-left: 50%;
-    margin-right: 50%;
+    margin-right: 0px;
+    width: 100%;
+    height: 100%;
     border: none;
 }
 
 #contentPart{
     padding: 20px;
+    overflow-y: auto;
 }
 
 #footerButtons{
-    margin-right: 10px;
-    background-color: rgb(199, 199, 199);
+    padding-right: 20px;
+    border-top: solid 1px;
+    border-color: rgba(0, 0, 0, 0.679);
 }
 
 #rmvButton{
     float: right;
+    width: 40px;
+}
+
+#domainAdd{
+    width: 40px;
+}
+
+#pathAddButton{
+    width: 40px;
+}
+
+#pathRemoveButton{
+    float: right;
+    width: 40px;
 }
 
 #logMessage{
     display: none;
+}
+
+#buttonsContainer{
+    margin-right: 135px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#textContainer{
+    margin-right: 160px;
 }
