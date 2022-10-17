@@ -3,7 +3,7 @@ const nextButton = document.getElementById('nextButton');
 const backButton = document.getElementById('backButton');
 const pageContent = document.getElementById('contentPart');
 
-var fs = require('fs');
+const fs = require('fs');
 
 var x = 6;
 var domainInputCounter = 1;
@@ -120,6 +120,7 @@ var ourMasterNode;
 var ourRepoUrl = "";
 var bigtopComponents = new Array();
 var installationPaths = new Array();
+var domanKeyVal = new Array();
 
 const {NodeSSH} = require('node-ssh');
 
@@ -396,7 +397,64 @@ nextButton.addEventListener('click', () => {
         "sudo /opt/puppetlabs/bin/puppet apply --parser future --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules /bigtop-home/bigtop-deploy/puppet/manifests"
         ;
         
-        console.log(installerTemplate);
+        fs.writeFileSync('installer.sh', installerTemplate);
+        
+        var entireContent = document.getElementById("contentContainer");
+        var footerPart = document.getElementById("footerButtons");
+        footerPart.remove();
+
+        entireContent.style.marginLeft = "10px";
+
+        entireContent.innerHTML = "<h5>Installation Started</h5><p>Installation Log:</p>"+
+        "<textarea id='sshLog' cols='30' rows='10'></textarea>"
+
+        var sshLog = document.getElementById("sshLog");
+
+        const password = '1234'
+        domainCounter = 0;
+        for(var i = 0; i < inputDomains.length; i++)
+        {
+          const ssh = new NodeSSH();
+          var myConfig = {host : inputDomains[domainCounter],  username: 'root',port: 22,password,tryKeyboard: true};
+          // ssh.connect({
+          //   host: inputDomains[domainCounter],
+          //   //host:'centos1', is not working Windows now.
+          //   username: 'root',
+          //   port: 22,
+          //   password,
+          //   tryKeyboard: true,
+          // })
+          ssh.connect(myConfig)
+          .then(function(){
+              
+              sshLog.value += "Connected Host(" + myConfig.host +')\n';
+          })
+          .then(function() {
+              ssh.putFile('installer.sh', '/home/centos/poleposition/installer.sh').then(function() {
+                  sshLog.value += "File thing is done 1 For host " + myConfig.host + '\n';
+                  
+              }, function(error) {
+                  sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
+          }).then(function(){
+              ssh.execCommand('chmod +x ./installer.sh',{ cwd:'/home/centos/poleposition'}).then(function()
+              {
+                sshLog.value += "File thing is done 2 For host(" + myConfig.host + ')\n';
+
+              }, function(error) {
+                sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
+              })
+          }).then(function(){
+              ssh.execCommand('./installer.sh', { cwd:'/home/centos/poleposition' }).then(function(result) {
+                  sshLog.value += 'STDOUT(' + myConfig.host + '): ' + result.stdout + '\n';
+                  sshLog.value += 'STDERR(' + myConfig.host + '): ' + result.stderr + '\n';
+                })
+          })
+          })
+
+          domainCounter++;
+        }
+
+        console.log(domainCounter);
 
         // var repoUrlText = document.getElementById("repoUrl");
         // if(repoUrlText.value == "")
