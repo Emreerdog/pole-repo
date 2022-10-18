@@ -10,6 +10,7 @@ p{
 
 textarea{
     resize: none;
+    font-size: smaller;
 }
 
 #contentContainer{

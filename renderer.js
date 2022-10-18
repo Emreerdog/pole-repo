@@ -91,7 +91,7 @@ var page5 = "<h5>Repo URL</h5>"+
 "<small class='text-danger' id='logMessage'>*Repo field can not be blank</small>"+
 "<p>Enter Bigtop Repo URL:</p>"+
 "<label for='repoUrl'>Repo URL: </label>"+
-"<input type='text' id='repoUrl' name='repoUrl' class='w-100' value='http://repos.bigtop.apache.org/releases/3.0.0/centos/7/x86_64'>"
+"<input type='text' id='repoUrl' name='repoUrl' class='w-100' value='http://repos.bigtop.apache.org/releases/3.1.1/rockylinux/8/x86_64'>"
 
 var page6 = "<h5>Install Path</h5>"+
 "<small class='text-danger' id='logMessage'>*Installation paths must be supplied</small>"+
@@ -120,7 +120,8 @@ var ourMasterNode;
 var ourRepoUrl = "";
 var bigtopComponents = new Array();
 var installationPaths = new Array();
-var domanKeyVal = new Array();
+var domaninKeyVal = new Array();
+var sshObject;
 
 const {NodeSSH} = require('node-ssh');
 
@@ -207,6 +208,58 @@ function pathRemoveLogic()
     var pathTextContainer = document.getElementById("textContainer");
     pathTextContainer.removeChild(pathTextContainer.lastChild);
     pathCounter--;
+}
+
+function startShellExecute(vals)
+{
+  var mSSHLog = document.getElementById("sshLog");
+  if(vals.modExecuted == false)
+  {
+    mSSHLog.value += "Configuration failed(" + vals.sshConfig.host + ")\n";
+  }
+  else
+  {
+    mSSHLog.value += "Executing shell(" + vals.sshConfig.host + ")\n";
+    vals.sshInstance.execCommand('./installer.sh', { cwd:'/home/poleposition' }).then(function(result){
+      mSSHLog.value += "STDOUT(" + vals.sshConfig.host + "): " + result.stdout + "\n";
+      mSSHLog.value += "STDERR(" + vals.sshConfig.host + "): " + result.stderr + "\n";
+    })
+  }
+}
+
+function sentThenChmod(val)
+{
+  var mSSHLog = document.getElementById("sshLog");
+  if(val.fileSent == false)
+  {
+    mSSHLog.value += "Unable to send installer file(" + val.sshConfig.host + ")\n";
+  }
+  else
+  {
+    mSSHLog.value += "Setting up configurations(" + val.sshConfig.host + ")\n";
+    val.sshInstance.execCommand('chmod +x ./installer.sh',{ cwd:'/home/poleposition'}).then(function(){
+      val.modExecuted = true;
+    });
+    setTimeout(function(){startShellExecute(val)}, 5000);
+  }
+}
+
+function connectThenSend(value, index, selfArray)
+{
+  var mSSHLog = document.getElementById("sshLog");
+  if(value.sshInstance.isConnected() == false || value.sshInstance == undefined)
+  {
+    mSSHLog.value += "Unable to connect host(" + value.sshConfig.host + ")\n"; 
+  }
+  else
+  {
+    mSSHLog.value += "Connected host(" + value.sshConfig.host + ")\n";
+    value.sshInstance.putFile('installer.sh', '/home/poleposition/installer.sh').then(function(){
+      mSSHLog.value += "Installer file sent(" + value.sshConfig.host + ")\n";
+      value.fileSent = true;
+    });
+    setTimeout(function(){sentThenChmod(value)}, 5000);
+  }
 }
 
 nextButton.addEventListener('click', () => {
@@ -370,17 +423,17 @@ nextButton.addEventListener('click', () => {
           bigtopPart += "- " + bigtopComponents[i] + "\n";
         }
 
-        var installerTemplate = "RED=\"\\033[0;31m\"; BLUE=\"\\033[0;34m\"; DEFAULTC=\"\\033[0m\""+
+        var installerTemplate = "#!/bin/bash\n"+"RED=\"\\033[0;31m\"; BLUE=\"\\033[0;34m\"; DEFAULTC=\"\\033[0m\""+
         "printf \"\nWelcome to the BEARTELL ${RED}Bigtop${DEFAULTC} installer\n\n\""+
         "# Install Dependencies\n"+
         "sudo yum -y install git\n\n"+
         "# Install Puppet\n" +
-        "sudo rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm\n"+
+        "sudo rpm -ivh http://yum.puppetlabs.com/puppet5-release-el-8.noarch.rpm\n"+
         "sudo yum -y install puppet\n"+
         "sudo /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib\n\n\n"+
         "# Install Bigtop Puppet\n"+
         "sudo git clone https://github.com/apache/bigtop.git /bigtop-home\n"+
-        "sudo sh -c \"cd /bigtop-home; git checkout release-3.0.0\"\n"+
+        "sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"\n"+
         "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
         "sudo cp /bigtop-home/bigtop-deploy/puppet/hiera.yaml /etc/puppet/\n\n\n"+
         "# Configure\n"+
@@ -388,11 +441,11 @@ nextButton.addEventListener('click', () => {
         "---\n"+
         "bigtop::hadoop_head_node: \"" + ourMasterNode + "\"\n"+
         "hadoop::hadoop_storage_dirs:\n" + installTargets + 
-        "hadoop_cluster_node::cluster_components:\n"+
+        "hadoop_cluster_node::cluster_components:\n"+"- hdfs\n"+
         bigtopPart+
         "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
         "bigtop::bigtop_repo_uri: " + "\"" + ourRepoUrl + "\"\n"+
-        "EOF\"\n\n\n"+
+        "EOF\n\"\n\n\n"+
         "# Deploy \n"+
         "sudo /opt/puppetlabs/bin/puppet apply --parser future --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules /bigtop-home/bigtop-deploy/puppet/manifests"
         ;
@@ -412,47 +465,62 @@ nextButton.addEventListener('click', () => {
 
         const password = '1234'
         domainCounter = 0;
+
         for(var i = 0; i < inputDomains.length; i++)
         {
-          const ssh = new NodeSSH();
-          var myConfig = {host : inputDomains[domainCounter],  username: 'root',port: 22,password,tryKeyboard: true};
-          // ssh.connect({
-          //   host: inputDomains[domainCounter],
-          //   //host:'centos1', is not working Windows now.
-          //   username: 'root',
-          //   port: 22,
-          //   password,
-          //   tryKeyboard: true,
-          // })
-          ssh.connect(myConfig)
-          .then(function(){
-              
-              sshLog.value += "Connected Host(" + myConfig.host +')\n';
-          })
-          .then(function() {
-              ssh.putFile('installer.sh', '/home/centos/poleposition/installer.sh').then(function() {
-                  sshLog.value += "File thing is done 1 For host " + myConfig.host + '\n';
-                  
-              }, function(error) {
-                  sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
-          }).then(function(){
-              ssh.execCommand('chmod +x ./installer.sh',{ cwd:'/home/centos/poleposition'}).then(function()
-              {
-                sshLog.value += "File thing is done 2 For host(" + myConfig.host + ')\n';
-
-              }, function(error) {
-                sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
-              })
-          }).then(function(){
-              ssh.execCommand('./installer.sh', { cwd:'/home/centos/poleposition' }).then(function(result) {
-                  sshLog.value += 'STDOUT(' + myConfig.host + '): ' + result.stdout + '\n';
-                  sshLog.value += 'STDERR(' + myConfig.host + '): ' + result.stderr + '\n';
-                })
-          })
-          })
-
-          domainCounter++;
+          var ssh = new NodeSSH();
+          var myConfig = {host : inputDomains[i],  username: 'root',port: 22,password,tryKeyboard: true};
+          sshObject = {sshInstance : ssh, sshConfig : myConfig, fileSent : false, modExecuted : false};
+          domaninKeyVal.push(sshObject);
+          sshObject.sshInstance.connect(sshObject.sshConfig);
         }
+
+        setTimeout(function(){
+          domaninKeyVal.map(connectThenSend)
+        },
+        5000);
+
+        // for(var i = 0; i < inputDomains.length; i++)
+        // {
+        //   const ssh = new NodeSSH();
+        //   var myConfig = {host : inputDomains[domainCounter],  username: 'root',port: 22,password,tryKeyboard: true};
+        //   // ssh.connect({
+        //   //   host: inputDomains[domainCounter],
+        //   //   //host:'centos1', is not working Windows now.
+        //   //   username: 'root',
+        //   //   port: 22,
+        //   //   password,
+        //   //   tryKeyboard: true,
+        //   // })
+        //   ssh.connect(myConfig)
+        //   .then(function(){
+              
+        //       sshLog.value += "Connected Host(" + myConfig.host +')\n';
+        //   })
+        //   .then(function() {
+        //       ssh.putFile('installer.sh', '/home/centos/poleposition/installer.sh').then(function() {
+        //           sshLog.value += "File thing is done 1 For host " + myConfig.host + '\n';
+                  
+        //       }, function(error) {
+        //           sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
+        //   }).then(function(){
+        //       ssh.execCommand('chmod +x ./installer.sh',{ cwd:'/home/centos/poleposition'}).then(function()
+        //       {
+        //         sshLog.value += "File thing is done 2 For host(" + myConfig.host + ')\n';
+
+        //       }, function(error) {
+        //         sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
+        //       })
+        //   }).then(function(){
+        //       ssh.execCommand('./installer.sh', { cwd:'/home/centos/poleposition' }).then(function(result) {
+        //           sshLog.value += 'STDOUT(' + myConfig.host + '): ' + result.stdout + '\n';
+        //           sshLog.value += 'STDERR(' + myConfig.host + '): ' + result.stderr + '\n';
+        //         })
+        //   })
+        //   })
+
+        //   domainCounter++;
+        // }
 
         console.log(domainCounter);
 
