@@ -122,11 +122,29 @@ var bigtopComponents = new Array();
 var installationPaths = new Array();
 var domaninKeyVal = new Array();
 var sshObject;
+var selectedDomain;
 
 const {NodeSSH} = require('node-ssh');
 
 pageContent.innerHTML = page1;
 pageCounter++;
+
+function domainLogSelect()
+{
+  var myDoms = document.getElementById("domainSelect");
+  var sLog = document.getElementById("sshLog");
+  for(var i = 0; i < domaninKeyVal.length; i++)
+  {
+    var tempObject = domaninKeyVal[i];
+    if(tempObject.sshConfig.host == myDoms.value)
+    {
+      selectedDomain = tempObject;
+      console.log(selectedDomain);
+      sLog.value = selectedDomain.personalLog;
+      break;
+    }
+  }
+}
 
 function reloadDomains(){
   backButton.className = "btn btn-dark btn-sm";
@@ -209,20 +227,88 @@ function pathRemoveLogic()
     pathTextContainer.removeChild(pathTextContainer.lastChild);
     pathCounter--;
 }
+//added preinstaller
+function startShellExecutePre(vals)
+{
+  var mSSHLog = document.getElementById("sshLog");
+  if(vals.modExecuted == false)
+  {
+    vals.personalLog += "Configuration failed preinstaller(" + vals.sshConfig.host + ")\n";
+    mSSHLog.value += "Configuration failed preinstaller(" + selectedDomain.sshConfig.host + ")\n";
+  }
+  else
+  {
+    vals.personalLog += "Executing shell for preinstaller(" + vals.sshConfig.host + ")\n";
+    mSSHLog.value += "Executing shell preinstaller(" + selectedDomain.sshConfig.host + ")\n";
+    vals.sshInstance.execCommand('./preinstaller.sh', { cwd:'/home/poleposition' }).then(function(result){
+      vals.personalLog += "STDOUT(" + vals.sshConfig.host + "): " + result.stdout + "\n";
+      vals.personalLog += "STDERR(" + vals.sshConfig.host + "): " + result.stderr + "\n";
+      mSSHLog.value += "STDOUT(" + selectedDomain.sshConfig.host + "): " + result.stdout + "\n";
+      mSSHLog.value += "STDERR(" + selectedDomain.sshConfig.host + "): " + result.stderr + "\n";
+    });
+    setTimeout(function(){connectThenSend(vals)}, 5000);
+  }
+}
 
+function sentThenChmodPre(val)
+{
+  var mSSHLog = document.getElementById("sshLog");
+  if(val.fileSent == false)
+  {
+    // mSSHLog.value += "Unable to send installer file(" + val.sshConfig.host + ")\n";
+    mSSHLog.value += "Unable to send preinstaller file(" + selectedDomain.sshConfig.host + ")\n";
+    val.personalLog += "Unable to send preinstaller file(" + val.sshConfig.host + ")\n";
+  }
+  else
+  {
+    mSSHLog.value += "Setting up configurations preinstaller(" + selectedDomain.sshConfig.host + ")\n";
+    val.personalLog += "Setting up configurations preinstaller(" + val.sshConfig.host + ")\n";
+    val.sshInstance.execCommand('sudo chmod 777 ./preinstaller.sh',{ cwd:'/home/poleposition'}).then(function(){
+      val.modExecuted = true;
+    });
+    setTimeout(function(){startShellExecutePre(val)}, 5000);
+  }
+}
+
+function connectThenSendPre(value, index, selfArray)
+{
+  var mSSHLog = document.getElementById("sshLog");
+  if(value.sshInstance.isConnected() == false || value.sshInstance == undefined)
+  {
+    mSSHLog.value += "Unable to connect host preinstaller(" + value.sshConfig.host + ")\n"; 
+    //vals.personalLog += "Unable to connect host(" + value.sshConfig.host + ")\n"; 
+  }
+  else
+  {
+    value.personalLog += "Connected host preinstaller(" + value.sshConfig.host + ")\n";
+    
+    mSSHLog.value += "Connected host preinstaller(" + selectedDomain.sshConfig.host + ")\n";
+    value.sshInstance.putFile('preinstaller.sh', '/home/poleposition/preinstaller.sh').then(function(){
+      mSSHLog.value += "Preinstaller file sent(" + selectedDomain.sshConfig.host + ")\n";
+      value.personalLog += "Preinstaller file sent(" + value.sshConfig.host + ")\n";
+      value.fileSent = true;
+    });
+    setTimeout(function(){sentThenChmodPre(value)}, 5000);
+  }
+}
+//finshed preinstaller
 function startShellExecute(vals)
 {
   var mSSHLog = document.getElementById("sshLog");
   if(vals.modExecuted == false)
   {
-    mSSHLog.value += "Configuration failed(" + vals.sshConfig.host + ")\n";
+    vals.personalLog += "Configuration failed(" + vals.sshConfig.host + ")\n";
+    mSSHLog.value += "Configuration failed(" + selectedDomain.sshConfig.host + ")\n";
   }
   else
   {
-    mSSHLog.value += "Executing shell(" + vals.sshConfig.host + ")\n";
-    vals.sshInstance.execCommand('./installer.sh', { cwd:'/home/poleposition' }).then(function(result){
-      mSSHLog.value += "STDOUT(" + vals.sshConfig.host + "): " + result.stdout + "\n";
-      mSSHLog.value += "STDERR(" + vals.sshConfig.host + "): " + result.stderr + "\n";
+    vals.personalLog += "Executing shell(" + vals.sshConfig.host + ")\n";
+    mSSHLog.value += "Executing shell(" + selectedDomain.sshConfig.host + ")\n";
+    vals.sshInstance.execCommand('sudo ./installer.sh', { cwd:'/home/poleposition' }).then(function(result){
+      vals.personalLog += "STDOUT(" + vals.sshConfig.host + "): " + result.stdout + "\n";
+      vals.personalLog += "STDERR(" + vals.sshConfig.host + "): " + result.stderr + "\n";
+      mSSHLog.value += "STDOUT(" + selectedDomain.sshConfig.host + "): " + result.stdout + "\n";
+      mSSHLog.value += "STDERR(" + selectedDomain.sshConfig.host + "): " + result.stderr + "\n";
     })
   }
 }
@@ -232,12 +318,15 @@ function sentThenChmod(val)
   var mSSHLog = document.getElementById("sshLog");
   if(val.fileSent == false)
   {
-    mSSHLog.value += "Unable to send installer file(" + val.sshConfig.host + ")\n";
+    // mSSHLog.value += "Unable to send installer file(" + val.sshConfig.host + ")\n";
+    mSSHLog.value += "Unable to send installer file(" + selectedDomain.sshConfig.host + ")\n";
+    val.personalLog += "Unable to send installer file(" + val.sshConfig.host + ")\n";
   }
   else
   {
-    mSSHLog.value += "Setting up configurations(" + val.sshConfig.host + ")\n";
-    val.sshInstance.execCommand('chmod +x ./installer.sh',{ cwd:'/home/poleposition'}).then(function(){
+    mSSHLog.value += "Setting up configurations(" + selectedDomain.sshConfig.host + ")\n";
+    val.personalLog += "Setting up configurations(" + val.sshConfig.host + ")\n";
+    val.sshInstance.execCommand('sudo chmod 777 ./installer.sh',{ cwd:'/home/poleposition'}).then(function(){
       val.modExecuted = true;
     });
     setTimeout(function(){startShellExecute(val)}, 5000);
@@ -250,12 +339,16 @@ function connectThenSend(value, index, selfArray)
   if(value.sshInstance.isConnected() == false || value.sshInstance == undefined)
   {
     mSSHLog.value += "Unable to connect host(" + value.sshConfig.host + ")\n"; 
+    //vals.personalLog += "Unable to connect host(" + value.sshConfig.host + ")\n"; 
   }
   else
   {
-    mSSHLog.value += "Connected host(" + value.sshConfig.host + ")\n";
+    value.personalLog += "Connected host(" + value.sshConfig.host + ")\n";
+    
+    mSSHLog.value += "Connected host(" + selectedDomain.sshConfig.host + ")\n";
     value.sshInstance.putFile('installer.sh', '/home/poleposition/installer.sh').then(function(){
-      mSSHLog.value += "Installer file sent(" + value.sshConfig.host + ")\n";
+      mSSHLog.value += "Installer file sent(" + selectedDomain.sshConfig.host + ")\n";
+      value.personalLog += "Installer file sent(" + value.sshConfig.host + ")\n";
       value.fileSent = true;
     });
     setTimeout(function(){sentThenChmod(value)}, 5000);
@@ -423,19 +516,21 @@ nextButton.addEventListener('click', () => {
           bigtopPart += "- " + bigtopComponents[i] + "\n";
         }
 
-        var installerTemplate = "#!/bin/bash\n"+"RED=\"\\033[0;31m\"; BLUE=\"\\033[0;34m\"; DEFAULTC=\"\\033[0m\""+
-        "printf \"\nWelcome to the BEARTELL ${RED}Bigtop${DEFAULTC} installer\n\n\""+
+        var installerTemplate = "#!/bin/bash\n"+
+        "RED=\"\\033[0;31m\"; BLUE=\"\\033[0;34m\"; DEFAULTC=\"\\033[0m\"\n"+
+        "printf \"\nWelcome to the BEARTELL ${RED}Bigtop${DEFAULTC} installer\n\n\"\n"+
         "# Install Dependencies\n"+
-        "sudo yum -y install git\n\n"+
+        "#sudo yum -y install git\n\n"+
         "# Install Puppet\n" +
         "sudo rpm -ivh http://yum.puppetlabs.com/puppet5-release-el-8.noarch.rpm\n"+
         "sudo yum -y install puppet\n"+
-        "sudo /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib\n\n\n"+
+        "/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 4.12.0\n\n\n"+
         "# Install Bigtop Puppet\n"+
-        "sudo git clone https://github.com/apache/bigtop.git /bigtop-home\n"+
-        "sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"\n"+
+        "#sudo git clone https://github.com/apache/bigtop.git /bigtop-home \n"+
         "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+        "#sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"\n"+
         "sudo cp /bigtop-home/bigtop-deploy/puppet/hiera.yaml /etc/puppet/\n\n\n"+
+        "sudo find /etc/puppet\n"+
         "# Configure\n"+
         "sudo su root -c \"cat > /etc/puppet/hieradata/site.yaml << EOF\n"+
         "---\n"+
@@ -447,7 +542,9 @@ nextButton.addEventListener('click', () => {
         "bigtop::bigtop_repo_uri: " + "\"" + ourRepoUrl + "\"\n"+
         "EOF\n\"\n\n\n"+
         "# Deploy \n"+
-        "sudo /opt/puppetlabs/bin/puppet apply --parser future --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules /bigtop-home/bigtop-deploy/puppet/manifests"
+        "echo 'Puppet apply started'\n"+
+        "sleep 2\n"+
+        "/opt/puppetlabs/bin/puppet apply --hiera_config=/etc/puppet/hiera.yaml --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules:/usr/share/puppet/modules:/etc/puppetlabs/code/environments/production/modules /bigtop-home/bigtop-deploy/puppet/manifests"
         ;
         
         fs.writeFileSync('installer.sh', installerTemplate);
@@ -459,9 +556,11 @@ nextButton.addEventListener('click', () => {
         entireContent.style.marginLeft = "10px";
 
         entireContent.innerHTML = "<h5>Installation Started</h5><p>Installation Log:</p>"+
-        "<textarea id='sshLog' cols='30' rows='10'></textarea>"
+        "<select name='domainSelect' id='domainSelect'></select>"+
+        "<textarea id='sshLog' cols='30' rows='10'></textarea>";
 
         var sshLog = document.getElementById("sshLog");
+        var domainSelect = document.getElementById("domainSelect");
 
         const password = '1234'
         domainCounter = 0;
@@ -470,13 +569,21 @@ nextButton.addEventListener('click', () => {
         {
           var ssh = new NodeSSH();
           var myConfig = {host : inputDomains[i],  username: 'root',port: 22,password,tryKeyboard: true};
-          sshObject = {sshInstance : ssh, sshConfig : myConfig, fileSent : false, modExecuted : false};
+          sshObject = {sshInstance : ssh, sshConfig : myConfig, fileSent : false, modExecuted : false, personalLog : ""};
           domaninKeyVal.push(sshObject);
           sshObject.sshInstance.connect(sshObject.sshConfig);
+
+          var newDomain = document.createElement("option");
+          newDomain.innerHTML = myConfig.host;
+          domainSelect.appendChild(newDomain);
         }
 
+        selectedDomain = domaninKeyVal[0];
+
+        domainSelect.onchange = domainLogSelect;
+
         setTimeout(function(){
-          domaninKeyVal.map(connectThenSend)
+          domaninKeyVal.map(connectThenSendPre)
         },
         5000);
 
