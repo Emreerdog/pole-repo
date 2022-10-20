@@ -245,8 +245,9 @@ function startShellExecutePre(vals)
       vals.personalLog += "STDERR(" + vals.sshConfig.host + "): " + result.stderr + "\n";
       mSSHLog.value += "STDOUT(" + selectedDomain.sshConfig.host + "): " + result.stdout + "\n";
       mSSHLog.value += "STDERR(" + selectedDomain.sshConfig.host + "): " + result.stderr + "\n";
+      setTimeout(function(){connectThenSend(vals)}, 30000);
+
     });
-    setTimeout(function(){connectThenSend(vals)}, 5000);
   }
 }
 
@@ -527,10 +528,20 @@ nextButton.addEventListener('click', () => {
         "/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 4.12.0\n\n\n"+
         "# Install Bigtop Puppet\n"+
         "#sudo git clone https://github.com/apache/bigtop.git /bigtop-home \n"+
-        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
         "#sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"\n"+
+        "echo 'hieradata copied'\n\n"+
+        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+        "sleep 10\n"+
+        "sudo find /etc/puppet\n"+
         "sudo cp /bigtop-home/bigtop-deploy/puppet/hiera.yaml /etc/puppet/\n\n\n"+
         "sudo find /etc/puppet\n"+
+        "sleep 10\n"+
+
         "# Configure\n"+
         "sudo su root -c \"cat > /etc/puppet/hieradata/site.yaml << EOF\n"+
         "---\n"+

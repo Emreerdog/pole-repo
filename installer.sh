@@ -15,16 +15,26 @@ sudo yum -y install puppet
 
 # Install Bigtop Puppet
 #sudo git clone https://github.com/apache/bigtop.git /bigtop-home 
-sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/
 #sudo sh -c "cd /bigtop-home; git checkout release-3.1.1"
+echo 'hieradata copied'
+
+sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/
+sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/
+sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/
+sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/
+sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/
+sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/
+sleep 10
+sudo find /etc/puppet
 sudo cp /bigtop-home/bigtop-deploy/puppet/hiera.yaml /etc/puppet/
 
 
 sudo find /etc/puppet
+sleep 10
 # Configure
 sudo su root -c "cat > /etc/puppet/hieradata/site.yaml << EOF
 ---
-bigtop::hadoop_head_node: "rockylin3"
+bigtop::hadoop_head_node: "rocky1"
 hadoop::hadoop_storage_dirs:
 - /home/data
 hadoop_cluster_node::cluster_components:
