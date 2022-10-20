@@ -34,14 +34,16 @@ sleep 10
 # Configure
 sudo su root -c "cat > /etc/puppet/hieradata/site.yaml << EOF
 ---
-bigtop::hadoop_head_node: "rocky1"
+bigtop::hadoop_head_node: "asd"
 hadoop::hadoop_storage_dirs:
 - /home/data
 hadoop_cluster_node::cluster_components:
 - hdfs
-- hbase
+- flink
+- hive
 - zookeeper
-- yarn
+- spark-standalone
+- sqoop
 bigtop::jdk_package_name: "java-1.8.0-openjdk-devel.x86_64"
 bigtop::bigtop_repo_uri: "http://repos.bigtop.apache.org/releases/3.1.1/rockylinux/8/x86_64"
 EOF

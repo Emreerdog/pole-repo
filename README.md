@@ -19,6 +19,6 @@ Example of RockyLinux8:
 
 ```
 
-sudo yum -y update
+$ sudo yum -y update
 
 ```
