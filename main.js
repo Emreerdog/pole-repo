@@ -10,7 +10,6 @@ const createWindow = () => {
       },
       icon: './icon.png'
     })
-    //win.webContents.openDevTools();
     win.setResizable(false);
     win.loadFile('index.html');
     win.setMenu(null);

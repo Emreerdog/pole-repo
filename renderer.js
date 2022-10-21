@@ -5,6 +5,9 @@ const pageContent = document.getElementById('contentPart');
 
 const fs = require('fs');
 
+const POLEVIEWER = require('./PageViewer');
+var fileCont = fs.readFileSync("selamlar.json", 'utf-8');
+
 var x = 6;
 var domainInputCounter = 1;
 
@@ -123,6 +126,7 @@ var installationPaths = new Array();
 var domaninKeyVal = new Array();
 var sshObject;
 var selectedDomain;
+var newCommands = new Array();
 
 const {NodeSSH} = require('node-ssh');
 
@@ -243,6 +247,7 @@ function startShellExecutePre(vals)
     vals.sshInstance.execCommand('./preinstaller.sh', { cwd:'/home/poleposition' }).then(function(result){
       vals.personalLog += "STDOUT(" + vals.sshConfig.host + "): " + result.stdout + "\n";
       vals.personalLog += "STDERR(" + vals.sshConfig.host + "): " + result.stderr + "\n";
+      
       mSSHLog.value += "STDOUT(" + selectedDomain.sshConfig.host + "): " + result.stdout + "\n";
       mSSHLog.value += "STDERR(" + selectedDomain.sshConfig.host + "): " + result.stderr + "\n";
       setTimeout(function(){connectThenSend(vals)}, 30000);
@@ -308,6 +313,12 @@ function startShellExecute(vals)
     vals.sshInstance.execCommand('sudo ./installer.sh', { cwd:'/home/poleposition' }).then(function(result){
       vals.personalLog += "STDOUT(" + vals.sshConfig.host + "): " + result.stdout + "\n";
       vals.personalLog += "STDERR(" + vals.sshConfig.host + "): " + result.stderr + "\n";
+      for(var i = 0; i < newCommands.length; i++)
+      {
+        vals.sshInstance.execCommand(newCommands[i]).then(function(result_2){
+          vals.personalLog += "STDOUT(" + vals.sshConfig.host + "): " + result_2.stdout + "\n";
+        })
+      }
       mSSHLog.value += "STDOUT(" + selectedDomain.sshConfig.host + "): " + result.stdout + "\n";
       mSSHLog.value += "STDERR(" + selectedDomain.sshConfig.host + "): " + result.stderr + "\n";
     })
@@ -356,324 +367,326 @@ function connectThenSend(value, index, selfArray)
   }
 }
 
-nextButton.addEventListener('click', () => {
+// nextButton.addEventListener('click', () => {
 
-    if(pageCounter == 1)
-    {
-        backButton.className = "btn btn-dark btn-sm";
-        pageContent.innerHTML = page2;
-        var domainAddButton = document.getElementById("domainAdd");
-        var domainRemoveButton = document.getElementById("rmvButton");
+//     if(pageCounter == 1)
+//     {
+//         backButton.className = "btn btn-dark btn-sm";
+//         pageContent.innerHTML = page2;
+//         var domainAddButton = document.getElementById("domainAdd");
+//         var domainRemoveButton = document.getElementById("rmvButton");
       
-        domainAddButton.onclick = addDomainLogic;
-        domainRemoveButton.onclick = removeDomainLogic;
+//         domainAddButton.onclick = addDomainLogic;
+//         domainRemoveButton.onclick = removeDomainLogic;
         
-        domainCounter = 1;
-        if(inputDomains.length != 0)
-        {
-          var rawContainer = document.getElementById("textContainer");
-          var textContainerPart = rawContainer.children;
-          textContainerPart[0].value = inputDomains[0];
-          for(var i = 1; i < inputDomains.length; i++)
-          {
-            var newChild = document.createElement("input");
-            newChild.type = "text";
-            newChild.className = "w-100 mb-1";
-            newChild.id = "domainInput" + domainCounter;
-            newChild.value = inputDomains[i];
+//         domainCounter = 1;
+//         if(inputDomains.length != 0)
+//         {
+//           var rawContainer = document.getElementById("textContainer");
+//           var textContainerPart = rawContainer.children;
+//           textContainerPart[0].value = inputDomains[0];
+//           for(var i = 1; i < inputDomains.length; i++)
+//           {
+//             var newChild = document.createElement("input");
+//             newChild.type = "text";
+//             newChild.className = "w-100 mb-1";
+//             newChild.id = "domainInput" + domainCounter;
+//             newChild.value = inputDomains[i];
             
-            rawContainer.appendChild(newChild);
+//             rawContainer.appendChild(newChild);
 
-            domainCounter++;
-          }
-        }
-        pageCounter++;
+//             domainCounter++;
+//           }
+//         }
+//         pageCounter++;
       
-    }
+//     }
     
-    else if(pageCounter == 2){
-        var textContainerPart = document.getElementById("textContainer");
-        var logMsg = document.getElementById("logMessage");
-        var domainChild = textContainerPart.children;
-        var ourChildLenght = domainChild.length;
+//     else if(pageCounter == 2){
+//         var textContainerPart = document.getElementById("textContainer");
+//         var logMsg = document.getElementById("logMessage");
+//         var domainChild = textContainerPart.children;
+//         var ourChildLenght = domainChild.length;
 
-        for(var i = 0; i < domainChild.length; i++)
-        {
-            var currentChild = domainChild[i];
-            if(currentChild.value == "")
-            {
-                logMsg.style.display = "block";
-                return;
-            }
+//         for(var i = 0; i < domainChild.length; i++)
+//         {
+//             var currentChild = domainChild[i];
+//             if(currentChild.value == "")
+//             {
+//                 logMsg.style.display = "block";
+//                 return;
+//             }
 
-            if(inputDomains.length > i)
-            {
-              inputDomains[i] = currentChild.value;
-            }
-            else
-            {
-              inputDomains.push(currentChild.value);
-            }
-        }
-        domainCounter = 1;
-        pageContent.innerHTML = page3;
-        var masterNodeSelector = document.getElementById("masterSelect");
-        for(var i = 0; i < inputDomains.length; i++)
-        {
-            var optionElement = document.createElement("option");
-            optionElement.innerHTML = inputDomains[i];
-            masterNodeSelector.appendChild(optionElement);
-        }
-        pageCounter++;
-    }
+//             if(inputDomains.length > i)
+//             {
+//               inputDomains[i] = currentChild.value;
+//             }
+//             else
+//             {
+//               inputDomains.push(currentChild.value);
+//             }
+//         }
+//         domainCounter = 1;
+//         pageContent.innerHTML = page3;
+//         var masterNodeSelector = document.getElementById("masterSelect");
+//         for(var i = 0; i < inputDomains.length; i++)
+//         {
+//             var optionElement = document.createElement("option");
+//             optionElement.innerHTML = inputDomains[i];
+//             masterNodeSelector.appendChild(optionElement);
+//         }
+//         pageCounter++;
+//     }
 
-    else if(pageCounter == 3)
-    {
-        var masterNodeSelector = document.getElementById("masterSelect");
-        ourMasterNode = masterNodeSelector.value;
-        pageContent.innerHTML = page4; 
-        pageCounter++;
-    }
+//     else if(pageCounter == 3)
+//     {
+//         var masterNodeSelector = document.getElementById("masterSelect");
+//         ourMasterNode = masterNodeSelector.value;
+//         pageContent.innerHTML = page4; 
+//         pageCounter++;
+//     }
 
-    else if(pageCounter == 4)
-    {
-        var isElementSelected = false;
-        bigtopComponents = new Array();
-        for(var i = 0; i < 20; i++)
-        {
-            var inputElem = document.getElementById("comp"+i);
-            if(inputElem.checked == true)
-            {
-                bigtopComponents.push(inputElem.value);
-                isElementSelected = true;
-            }
-        }
+//     else if(pageCounter == 4)
+//     {
+//         var isElementSelected = false;
+//         bigtopComponents = new Array();
+//         for(var i = 0; i < 20; i++)
+//         {
+//             var inputElem = document.getElementById("comp"+i);
+//             if(inputElem.checked == true)
+//             {
+//                 bigtopComponents.push(inputElem.value);
+//                 isElementSelected = true;
+//             }
+//         }
 
-        if(isElementSelected == false)
-        {
-            var logMsg = document.getElementById("logMessage");
-            logMsg.style.display = "block";
-            return;
-        }
-        pageContent.innerHTML = page5;
-        var repoUrlText = document.getElementById("repoUrl");
-        if(ourRepoUrl != "")
-        {
-          repoUrlText.value = ourRepoUrl;
-        }
-        pageCounter++;
-    }
-    else if(pageCounter == 5)
-    {   
-        var repoUrlText = document.getElementById("repoUrl");
-        if(repoUrlText.value == "")
-        {
-          var logMsg = document.getElementById("logMessage");
-          logMsg.style.display = "block";
-          return;
-        }
-        ourRepoUrl = repoUrlText.value;
-        pageContent.innerHTML = page6;
-        nextButton.innerHTML = "Install";
-        pathCounter = 1;
+//         if(isElementSelected == false)
+//         {
+//             var logMsg = document.getElementById("logMessage");
+//             logMsg.style.display = "block";
+//             return;
+//         }
+//         pageContent.innerHTML = page5;
+//         var repoUrlText = document.getElementById("repoUrl");
+//         if(ourRepoUrl != "")
+//         {
+//           repoUrlText.value = ourRepoUrl;
+//         }
+//         pageCounter++;
+//     }
+//     else if(pageCounter == 5)
+//     {   
+//         var repoUrlText = document.getElementById("repoUrl");
+//         if(repoUrlText.value == "")
+//         {
+//           var logMsg = document.getElementById("logMessage");
+//           logMsg.style.display = "block";
+//           return;
+//         }
+//         ourRepoUrl = repoUrlText.value;
+//         pageContent.innerHTML = page6;
+//         nextButton.innerHTML = "Install";
+//         pathCounter = 1;
 
-        var pathAddBut = document.getElementById("pathAddButton");
-        var pathRemoveBut = document.getElementById("pathRemoveButton");
+//         var pathAddBut = document.getElementById("pathAddButton");
+//         var pathRemoveBut = document.getElementById("pathRemoveButton");
         
-        pathAddBut.onclick = pathAddLogic;
-        pathRemoveBut.onclick = pathRemoveLogic;
+//         pathAddBut.onclick = pathAddLogic;
+//         pathRemoveBut.onclick = pathRemoveLogic;
 
         
-        pageCounter++;
-    }
+//         pageCounter++;
+//     }
 
-    else if(pageCounter == 6)
-    {
+//     else if(pageCounter == 6)
+//     {
         
 
-        var ourTextContainer = document.getElementById("textContainer");
-        var tempInstallPaths = ourTextContainer.children;
-        installationPaths = new Array();
-        for(var i = 0; i < tempInstallPaths.length; i++)
-        {
-          if(tempInstallPaths[i].value == "")
-          {
-            var logMsg = document.getElementById("logMessage");
-            logMsg.style.display = "block";
-            return;
-          }
-          installationPaths.push(tempInstallPaths[i].value);
-        }
+//         var ourTextContainer = document.getElementById("textContainer");
+//         var tempInstallPaths = ourTextContainer.children;
+//         installationPaths = new Array();
+//         for(var i = 0; i < tempInstallPaths.length; i++)
+//         {
+//           if(tempInstallPaths[i].value == "")
+//           {
+//             var logMsg = document.getElementById("logMessage");
+//             logMsg.style.display = "block";
+//             return;
+//           }
+//           installationPaths.push(tempInstallPaths[i].value);
+//         }
 
-        var installTargets = "";
-        for(var i = 0; i < installationPaths.length; i++)
-        {
-          installTargets += "- " + installationPaths[i] + "\n";
-        }
+//         var installTargets = "";
+//         for(var i = 0; i < installationPaths.length; i++)
+//         {
+//           installTargets += "- " + installationPaths[i] + "\n";
+//         }
 
-        var bigtopPart = "";
-        for(var i = 0; i < bigtopComponents.length; i++)
-        {
-          bigtopPart += "- " + bigtopComponents[i] + "\n";
-        }
+//         var bigtopPart = "";
+//         for(var i = 0; i < bigtopComponents.length; i++)
+//         {
+//           bigtopPart += "- " + bigtopComponents[i] + "\n";
+//         }
 
-        var installerTemplate = "#!/bin/bash\n"+
-        "RED=\"\\033[0;31m\"; BLUE=\"\\033[0;34m\"; DEFAULTC=\"\\033[0m\"\n"+
-        "printf \"\nWelcome to the BEARTELL ${RED}Bigtop${DEFAULTC} installer\n\n\"\n"+
-        "# Install Dependencies\n"+
-        "#sudo yum -y install git\n\n"+
-        "# Install Puppet\n" +
-        "sudo rpm -ivh http://yum.puppetlabs.com/puppet5-release-el-8.noarch.rpm\n"+
-        "sudo yum -y install puppet\n"+
-        "/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 4.12.0\n\n\n"+
-        "# Install Bigtop Puppet\n"+
-        "#sudo git clone https://github.com/apache/bigtop.git /bigtop-home \n"+
-        "#sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"\n"+
-        "echo 'hieradata copied'\n\n"+
-        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
-        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
-        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
-        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
-        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
-        "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
-        "sleep 10\n"+
-        "sudo find /etc/puppet\n"+
-        "sudo cp /bigtop-home/bigtop-deploy/puppet/hiera.yaml /etc/puppet/\n\n\n"+
-        "sudo find /etc/puppet\n"+
-        "sleep 10\n"+
+//         var installerTemplate = "#!/bin/bash\n"+
+//         "RED=\"\\033[0;31m\"; BLUE=\"\\033[0;34m\"; DEFAULTC=\"\\033[0m\"\n"+
+//         "printf \"\nWelcome to the BEARTELL ${RED}Bigtop${DEFAULTC} installer\n\n\"\n"+
+//         "# Install Dependencies\n"+
+//         "#sudo yum -y install git\n\n"+
+//         "# Install Puppet\n" +
+//         "sudo rpm -ivh http://yum.puppetlabs.com/puppet5-release-el-8.noarch.rpm\n"+
+//         "sudo yum -y install puppet\n"+
+//         "/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 4.12.0\n\n\n"+
+//         "# Install Bigtop Puppet\n"+
+//         "#sudo git clone https://github.com/apache/bigtop.git /bigtop-home \n"+
+//         "#sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"\n"+
+//         "echo 'hieradata copied'\n\n"+
+//         "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+//         "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+//         "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+//         "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+//         "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+//         "sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/\n"+
+//         "sleep 10\n"+
+//         "sudo find /etc/puppet\n"+
+//         "sudo cp /bigtop-home/bigtop-deploy/puppet/hiera.yaml /etc/puppet/\n\n\n"+
+//         "sudo find /etc/puppet\n"+
+//         "sleep 10\n"+
 
-        "# Configure\n"+
-        "sudo su root -c \"cat > /etc/puppet/hieradata/site.yaml << EOF\n"+
-        "---\n"+
-        "bigtop::hadoop_head_node: \"" + ourMasterNode + "\"\n"+
-        "hadoop::hadoop_storage_dirs:\n" + installTargets + 
-        "hadoop_cluster_node::cluster_components:\n"+"- hdfs\n"+
-        bigtopPart+
-        "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
-        "bigtop::bigtop_repo_uri: " + "\"" + ourRepoUrl + "\"\n"+
-        "EOF\n\"\n\n\n"+
-        "# Deploy \n"+
-        "echo 'Puppet apply started'\n"+
-        "sleep 2\n"+
-        "/opt/puppetlabs/bin/puppet apply --hiera_config=/etc/puppet/hiera.yaml --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules:/usr/share/puppet/modules:/etc/puppetlabs/code/environments/production/modules /bigtop-home/bigtop-deploy/puppet/manifests"
-        ;
+//         "# Configure\n"+
+//         "sudo su root -c \"cat > /etc/puppet/hieradata/site.yaml << EOF\n"+
+//         "---\n"+
+//         "bigtop::hadoop_head_node: \"" + ourMasterNode + "\"\n"+
+//         "hadoop::hadoop_storage_dirs:\n" + installTargets + 
+//         "hadoop_cluster_node::cluster_components:\n"+"- hdfs\n"+
+//         bigtopPart+
+//         "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
+//         "bigtop::bigtop_repo_uri: " + "\"" + ourRepoUrl + "\"\n"+
+//         "EOF\n\"\n\n\n"+
+//         "# Deploy \n"+
+//         "echo 'Puppet apply started'\n"+
+//         "sleep 2\n"+
+//         "/opt/puppetlabs/bin/puppet apply --hiera_config=/etc/puppet/hiera.yaml --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules:/usr/share/puppet/modules:/etc/puppetlabs/code/environments/production/modules /bigtop-home/bigtop-deploy/puppet/manifests"
+//         ;
         
-        fs.writeFileSync('installer.sh', installerTemplate);
+//         fs.writeFileSync('installer.sh', installerTemplate);
         
-        var entireContent = document.getElementById("contentContainer");
-        var footerPart = document.getElementById("footerButtons");
-        footerPart.remove();
+//         var entireContent = document.getElementById("contentContainer");
+//         var footerPart = document.getElementById("footerButtons");
+//         footerPart.remove();
 
-        entireContent.style.marginLeft = "10px";
+//         entireContent.style.marginLeft = "10px";
 
-        entireContent.innerHTML = "<h5>Installation Started</h5><p>Installation Log:</p>"+
-        "<select name='domainSelect' id='domainSelect'></select>"+
-        "<textarea id='sshLog' cols='30' rows='10'></textarea>";
+//         entireContent.innerHTML = "<h5>Installation Started</h5><p>Installation Log:</p>"+
+//         "<select name='domainSelect' id='domainSelect'></select>"+
+//         "<textarea id='sshLog' cols='30' rows='10'></textarea>";
 
-        var sshLog = document.getElementById("sshLog");
-        var domainSelect = document.getElementById("domainSelect");
+//         var sshLog = document.getElementById("sshLog");
+//         var domainSelect = document.getElementById("domainSelect");
 
-        const password = '1234'
-        domainCounter = 0;
+//         const password = '1234'
+//         domainCounter = 0;
 
-        for(var i = 0; i < inputDomains.length; i++)
-        {
-          var ssh = new NodeSSH();
-          var myConfig = {host : inputDomains[i],  username: 'root',port: 22,password,tryKeyboard: true};
-          sshObject = {sshInstance : ssh, sshConfig : myConfig, fileSent : false, modExecuted : false, personalLog : ""};
-          domaninKeyVal.push(sshObject);
-          sshObject.sshInstance.connect(sshObject.sshConfig);
+//         for(var i = 0; i < inputDomains.length; i++)
+//         {
+//           var ssh = new NodeSSH();
+//           var myConfig = {host : inputDomains[i],  username: 'root',port: 22,password,tryKeyboard: true};
+//           sshObject = {sshInstance : ssh, sshConfig : myConfig, fileSent : false, modExecuted : false, personalLog : ""};
+//           domaninKeyVal.push(sshObject);
+//           sshObject.sshInstance.connect(sshObject.sshConfig);
 
-          var newDomain = document.createElement("option");
-          newDomain.innerHTML = myConfig.host;
-          domainSelect.appendChild(newDomain);
-        }
+//           var newDomain = document.createElement("option");
+//           newDomain.innerHTML = myConfig.host;
+//           domainSelect.appendChild(newDomain);
+//         }
 
-        selectedDomain = domaninKeyVal[0];
+//         selectedDomain = domaninKeyVal[0];
 
-        domainSelect.onchange = domainLogSelect;
+//         domainSelect.onchange = domainLogSelect;
 
-        setTimeout(function(){
-          domaninKeyVal.map(connectThenSendPre)
-        },
-        5000);
+//         setTimeout(function(){
+//           domaninKeyVal.map(connectThenSendPre)
+//         },
+//         5000);
 
-        // for(var i = 0; i < inputDomains.length; i++)
-        // {
-        //   const ssh = new NodeSSH();
-        //   var myConfig = {host : inputDomains[domainCounter],  username: 'root',port: 22,password,tryKeyboard: true};
-        //   // ssh.connect({
-        //   //   host: inputDomains[domainCounter],
-        //   //   //host:'centos1', is not working Windows now.
-        //   //   username: 'root',
-        //   //   port: 22,
-        //   //   password,
-        //   //   tryKeyboard: true,
-        //   // })
-        //   ssh.connect(myConfig)
-        //   .then(function(){
+//         // for(var i = 0; i < inputDomains.length; i++)
+//         // {
+//         //   const ssh = new NodeSSH();
+//         //   var myConfig = {host : inputDomains[domainCounter],  username: 'root',port: 22,password,tryKeyboard: true};
+//         //   // ssh.connect({
+//         //   //   host: inputDomains[domainCounter],
+//         //   //   //host:'centos1', is not working Windows now.
+//         //   //   username: 'root',
+//         //   //   port: 22,
+//         //   //   password,
+//         //   //   tryKeyboard: true,
+//         //   // })
+//         //   ssh.connect(myConfig)
+//         //   .then(function(){
               
-        //       sshLog.value += "Connected Host(" + myConfig.host +')\n';
-        //   })
-        //   .then(function() {
-        //       ssh.putFile('installer.sh', '/home/centos/poleposition/installer.sh').then(function() {
-        //           sshLog.value += "File thing is done 1 For host " + myConfig.host + '\n';
+//         //       sshLog.value += "Connected Host(" + myConfig.host +')\n';
+//         //   })
+//         //   .then(function() {
+//         //       ssh.putFile('installer.sh', '/home/centos/poleposition/installer.sh').then(function() {
+//         //           sshLog.value += "File thing is done 1 For host " + myConfig.host + '\n';
                   
-        //       }, function(error) {
-        //           sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
-        //   }).then(function(){
-        //       ssh.execCommand('chmod +x ./installer.sh',{ cwd:'/home/centos/poleposition'}).then(function()
-        //       {
-        //         sshLog.value += "File thing is done 2 For host(" + myConfig.host + ')\n';
+//         //       }, function(error) {
+//         //           sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
+//         //   }).then(function(){
+//         //       ssh.execCommand('chmod +x ./installer.sh',{ cwd:'/home/centos/poleposition'}).then(function()
+//         //       {
+//         //         sshLog.value += "File thing is done 2 For host(" + myConfig.host + ')\n';
 
-        //       }, function(error) {
-        //         sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
-        //       })
-        //   }).then(function(){
-        //       ssh.execCommand('./installer.sh', { cwd:'/home/centos/poleposition' }).then(function(result) {
-        //           sshLog.value += 'STDOUT(' + myConfig.host + '): ' + result.stdout + '\n';
-        //           sshLog.value += 'STDERR(' + myConfig.host + '): ' + result.stderr + '\n';
-        //         })
-        //   })
-        //   })
+//         //       }, function(error) {
+//         //         sshLog.value += 'File error('+ myConfig.host +'): ' + error + '\n';
+//         //       })
+//         //   }).then(function(){
+//         //       ssh.execCommand('./installer.sh', { cwd:'/home/centos/poleposition' }).then(function(result) {
+//         //           sshLog.value += 'STDOUT(' + myConfig.host + '): ' + result.stdout + '\n';
+//         //           sshLog.value += 'STDERR(' + myConfig.host + '): ' + result.stderr + '\n';
+//         //         })
+//         //   })
+//         //   })
 
-        //   domainCounter++;
-        // }
+//         //   domainCounter++;
+//         // }
 
-        console.log(domainCounter);
+//         console.log(domainCounter);
 
-        // var repoUrlText = document.getElementById("repoUrl");
-        // if(repoUrlText.value == "")
-        // {
-        //     // Repo url can not be empty
-        //     var logMsg = document.getElementById("logMessage");
-        //     logMsg.style.display = "block";
-        //     return;
-        // }
-        // ourRepoUrl = repoUrlText.value;
+//         // var repoUrlText = document.getElementById("repoUrl");
+//         // if(repoUrlText.value == "")
+//         // {
+//         //     // Repo url can not be empty
+//         //     var logMsg = document.getElementById("logMessage");
+//         //     logMsg.style.display = "block";
+//         //     return;
+//         // }
+//         // ourRepoUrl = repoUrlText.value;
         
        
 
-        // if(installPaths.length != 0)
-        // {
-        //   var pathContainer = document.getElementById("textContainer");
-        //   var childArmy = pathContainer.children;
-        //   childArmy[0].value = installPaths[0];
-        //   for(var i = 1; i < installPaths.length; i++)
-        //   {
-        //     var newBoy = document.createElement("input");
-        //     newBoy.type = "text";
-        //     newBoy.className = "w-100 mb-1";
-        //     newBoy.id = "pathInput" + pathCounter;
-        //     pathContainer.appendChild(newBoy);
-        //     pathCounter++;
-        //     countpath++;
-        //   }
-        // }
-    }
+//         // if(installPaths.length != 0)
+//         // {
+//         //   var pathContainer = document.getElementById("textContainer");
+//         //   var childArmy = pathContainer.children;
+//         //   childArmy[0].value = installPaths[0];
+//         //   for(var i = 1; i < installPaths.length; i++)
+//         //   {
+//         //     var newBoy = document.createElement("input");
+//         //     newBoy.type = "text";
+//         //     newBoy.className = "w-100 mb-1";
+//         //     newBoy.id = "pathInput" + pathCounter;
+//         //     pathContainer.appendChild(newBoy);
+//         //     pathCounter++;
+//         //     countpath++;
+//         //   }
+//         // }
+//     }
 
     
-});
+// });
+
+var pageViewerInstance = new POLEVIEWER(fileCont, "contentPart", "nextButton", "backButton");
 
 backButton.addEventListener('click', () => {
   if(pageCounter == 2){
