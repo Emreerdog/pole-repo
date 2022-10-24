@@ -3,6 +3,35 @@ const { NodeSSH } = require("node-ssh");
 var sshCommandList = new Array();
 var globalCommandCounter = 0;
 var connectionInfoObjects = new Array();
+var sshLogObject;
+var domainSelector;
+var workingDomain;
+
+function LogSelection()
+{
+    var outDomain = domainSelector.value;
+    for(var i = 0; i < connectionInfoObjects.length; i++)
+    {
+        if(outDomain == connectionInfoObjects[i].hostInfo)
+        {
+            workingDomain = connectionInfoObjects[i];
+            sshLogObject.value = workingDomain.outputLog;
+            return;
+        }
+    }
+}
+
+function ShellExecutor()
+{
+    for(var i = 0; i < connectionInfoObjects.length; i++)
+    {
+        var connectIndex = connectionInfoObjects[i].connIndex;
+        connectionInfoObjects[i].selfSsh.execCommand(sshCommandList[connectionInfoObjects[i].cmdIndex]).then(function(cmdResult){
+            connectionInfoObjects[connectIndex].outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
+            sshLogObject.value = workingDomain.outputLog;
+        })
+    }
+}
 
 function ConnectionValidation()
 {
@@ -87,16 +116,28 @@ var OnLoad = function(contentState)
     "<select name='domainSelect' id='domainSelect'></select>"+
     "<textarea id='sshLog' cols='30' rows='10'></textarea>";   
 
+    sshLogObject = document.getElementById("sshLog");
+
     var commandDisplayer = document.getElementById("cmdDisplayer");
+    domainSelector = document.getElementById("domainSelect");
+
+    domainSelector.onchange = LogSelection;
 
     var commandCount = sshCommandList.length * totalDomainInputs.length;
 
     for(var i = 0; i < totalDomainInputs.length; i++)
     {
         var sshInstance = new NodeSSH();
-        var newConnectionInformation = {selfSsh : sshInstance, isFinished : false, hostInfo : totalDomainInputs[i], outputLog: ""};
+        var newConnectionInformation = {selfSsh : sshInstance, isFinished : false, hostInfo : totalDomainInputs[i], outputLog: "", cmdIndex: 0, connIndex: 0};
         connectionInfoObjects.push(newConnectionInformation);
+        newConnectionInformation.connIndex = i;
+
+        var newOption = document.createElement("option");
+        newOption.innerHTML = newConnectionInformation.hostInfo;
+        domainSelector.appendChild(newOption);
     }
+
+    workingDomain = connectionInfoObjects[0];
 
     var password = "1234";
 
@@ -109,12 +150,16 @@ var OnLoad = function(contentState)
             password,
             tryKeyboard: false
         }
+
+        var connectIndex = connectionInfoObjects[i].connIndex;
+
         connectionInfoObjects[i].selfSsh.connect(myConfig).then(function(){
-            connectionInfoObjects[i].outputLog = "Connection Established\n";
+            connectionInfoObjects[connectIndex].outputLog += "Connection Established\n";
+            sshLogObject.value = workingDomain.outputLog;
         });
     }
 
-
+    setTimeout(ShellExecutor, 3000);
 
     commandDisplayer.innerHTML = globalCommandCounter + "/" + commandCount;
 
