@@ -18,6 +18,10 @@ html {
     height: 90%;
   }
   
+  #domainSelect{
+    margin-bottom: 10px;
+  }
+
   #poleLogo {
     margin-right: 0px;
     width: 100%;
