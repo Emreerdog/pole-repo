@@ -21,15 +21,35 @@ function LogSelection()
     }
 }
 
+function ExecuteRecursive(connectionInstance)
+{
+    if(connectionInstance.cmdIndex == sshCommandList.length)
+    {
+        return;
+    }
+
+    connectionInstance.selfSsh.execCommand(sshCommandList[connectionInstance.cmdIndex]).then(function(cmdResult){
+        connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
+        connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
+        sshLogObject.value = workingDomain.outputLog;
+        connectionInstance.cmdIndex++;
+        ExecuteRecursive(connectionInstance);
+    })
+}
+
 function ShellExecutor()
 {
     for(var i = 0; i < connectionInfoObjects.length; i++)
     {
-        var connectIndex = connectionInfoObjects[i].connIndex;
-        connectionInfoObjects[i].selfSsh.execCommand(sshCommandList[connectionInfoObjects[i].cmdIndex]).then(function(cmdResult){
-            connectionInfoObjects[connectIndex].outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
+        const cnInfo = connectionInfoObjects[i];
+        connectionInfoObjects[i].selfSsh.execCommand(sshCommandList[cnInfo.cmdIndex]).then(function(cmdResult){
+            cnInfo.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
+            cnInfo.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
             sshLogObject.value = workingDomain.outputLog;
+            cnInfo.cmdIndex++;
+            ExecuteRecursive(cnInfo);  
         })
+
     }
 }
 
@@ -104,10 +124,29 @@ var OnLoad = function(contentState)
     sshCommandList.push("sudo git clone https://github.com/apache/bigtop.git /bigtop-home");
     sshCommandList.push("sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"");
     sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
+    sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
+    sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
+    sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
+    sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
     sshCommandList.push("sudo cp /bigtop-home/bigtop-deploy/puppet/hiera.yaml /etc/puppet/");
     sshCommandList.push("sudo find /etc/puppet");
     sshCommandList.push(variadicCommand);
     sshCommandList.push("/opt/puppetlabs/bin/puppet apply --hiera_config=/etc/puppet/hiera.yaml --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules:/usr/share/puppet/modules:/etc/puppetlabs/code/environments/production/modules /bigtop-home/bigtop-deploy/puppet/manifests");
+    sshCommandList.push("echo Necessary ports for each host:");
+    sshCommandList.push("echo ----------------");
+    sshCommandList.push("echo Default File System Link:");
+    sshCommandList.push("hdfs getconf -confKey fs.defaultFS");
+    sshCommandList.push("echo ----------------");
+    sshCommandList.push("echo Yarn NodeManager Address");
+    sshCommandList.push("hdfs getconf -confKey yarn.nodemanager.webapp.address");
+    sshCommandList.push("echo ----------------");
+    sshCommandList.push("echo DataNode Address");
+    sshCommandList.push("hdfs getconf -confKey dfs.datanode.http.address");
+    sshCommandList.push("echo ----------------");
+    sshCommandList.push("echo NameNode Address");
+    sshCommandList.push("hdfs getconf -confKey dfs.namenode.http-address");
+    sshCommandList.push("echo ----------------");
+
 
     var myContent = document.getElementById("contentContainer");
     myContent.style.marginLeft = "10px";
@@ -150,11 +189,13 @@ var OnLoad = function(contentState)
             password,
             tryKeyboard: false
         }
-
-        var connectIndex = connectionInfoObjects[i].connIndex;
+        
+        const cnInfo = connectionInfoObjects[i];
 
         connectionInfoObjects[i].selfSsh.connect(myConfig).then(function(){
-            connectionInfoObjects[connectIndex].outputLog += "Connection Established\n";
+            console.log("Hello world");
+            console.log(myConfig);
+            cnInfo.outputLog += "Connection Established\n";
             sshLogObject.value = workingDomain.outputLog;
         });
     }
