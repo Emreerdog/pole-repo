@@ -53,6 +53,11 @@ html {
     width: 40px;
   }
   
+#sshLog {
+  color: black;
+  font-size: smaller;  
+}
+
   #pathRemoveButton {
     float: right;
     width: 40px;

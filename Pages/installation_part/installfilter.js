@@ -29,6 +29,17 @@ function ExecuteRecursive(connectionInstance)
     }
 
     connectionInstance.selfSsh.execCommand(sshCommandList[connectionInstance.cmdIndex]).then(function(cmdResult){
+
+        if(cmdResult.stdout != "")
+            {
+                connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
+            }
+
+            if(cmdResult.stderr != "")
+            {
+                connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
+            }
+
         connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
         connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
         sshLogObject.value = workingDomain.outputLog;
@@ -43,8 +54,16 @@ function ShellExecutor()
     {
         const cnInfo = connectionInfoObjects[i];
         connectionInfoObjects[i].selfSsh.execCommand(sshCommandList[cnInfo.cmdIndex]).then(function(cmdResult){
-            cnInfo.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
-            cnInfo.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
+            if(cmdResult.stdout != "")
+            {
+                cnInfo.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
+            }
+
+            if(cmdResult.stderr != "")
+            {
+                cnInfo.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
+            }
+
             sshLogObject.value = workingDomain.outputLog;
             cnInfo.cmdIndex++;
             ExecuteRecursive(cnInfo);  
@@ -132,6 +151,7 @@ var OnLoad = function(contentState)
     sshCommandList.push("sudo find /etc/puppet");
     sshCommandList.push(variadicCommand);
     sshCommandList.push("/opt/puppetlabs/bin/puppet apply --hiera_config=/etc/puppet/hiera.yaml --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules:/usr/share/puppet/modules:/etc/puppetlabs/code/environments/production/modules /bigtop-home/bigtop-deploy/puppet/manifests");
+    sshCommandList.push("sleep 5");
     sshCommandList.push("echo Necessary ports for each host:");
     sshCommandList.push("echo ----------------");
     sshCommandList.push("echo Default File System Link:");
@@ -153,7 +173,7 @@ var OnLoad = function(contentState)
     myContent.innerHTML = "<h5>Installation Started</h5><p>Installation Log:</p>"+
     "<p id='cmdDisplayer'></p>"+
     "<select name='domainSelect' id='domainSelect'></select>"+
-    "<textarea id='sshLog' cols='30' rows='10'></textarea>";   
+    "<textarea id='sshLog' cols='30' rows='10' disabled></textarea>";   
 
     sshLogObject = document.getElementById("sshLog");
 
