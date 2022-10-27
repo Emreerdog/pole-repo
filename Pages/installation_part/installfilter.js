@@ -152,6 +152,7 @@ var OnLoad = function(contentState)
     sshCommandList.push(variadicCommand);
     sshCommandList.push("/opt/puppetlabs/bin/puppet apply --hiera_config=/etc/puppet/hiera.yaml --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules:/usr/share/puppet/modules:/etc/puppetlabs/code/environments/production/modules /bigtop-home/bigtop-deploy/puppet/manifests");
     sshCommandList.push("sleep 5");
+    sshCommandList.push("chown hdfs:hdfs /home/data/")
     sshCommandList.push("echo Necessary ports for each host:");
     sshCommandList.push("echo ----------------");
     sshCommandList.push("echo Default File System Link:");
