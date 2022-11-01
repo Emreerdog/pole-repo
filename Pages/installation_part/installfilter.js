@@ -7,6 +7,12 @@ var sshLogObject;
 var domainSelector;
 var workingDomain;
 
+function UpdatePercentage() {
+    var currentVal = (100 * globalCommandCounter) / (sshCommandList.length * totalDomainInputs.length);
+    document.getElementById("installProgress").style.width = currentVal + '%';
+} 
+ 
+
 function LogSelection()
 {
     var outDomain = domainSelector.value;
@@ -40,6 +46,8 @@ function ExecuteRecursive(connectionInstance)
                 connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
             }
 
+        globalCommandCounter++;
+        UpdatePercentage();
         connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
         connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
         sshLogObject.value = workingDomain.outputLog;
@@ -63,7 +71,8 @@ function ShellExecutor()
             {
                 cnInfo.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
             }
-
+            globalCommandCounter++;
+            UpdatePercentage();
             sshLogObject.value = workingDomain.outputLog;
             cnInfo.cmdIndex++;
             ExecuteRecursive(cnInfo);  
@@ -113,6 +122,7 @@ var OnLoad = function(contentState)
     const givenRepoUrl = contentState.pageContentState["SelectedUrl"]; // STRING
     const givenMasterNode = contentState.pageContentState["MasterNode"]; // STRING
 
+
     var componentsString = "";
     for(var i = 0; i < totalComponents.length; i++)
     {
@@ -135,6 +145,7 @@ var OnLoad = function(contentState)
     "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
     "bigtop::bigtop_repo_uri: \"" + givenRepoUrl + "\"\nEOF\n\"";
 
+    contentState.DisableFooterPart();
 
     sshCommandList.push("sudo yum -y install git");
     sshCommandList.push("sudo rpm -ivh http://yum.puppetlabs.com/puppet5-release-el-8.noarch.rpm");
@@ -173,11 +184,11 @@ var OnLoad = function(contentState)
     myContent.style.marginLeft = "10px";
     myContent.innerHTML = "<h5>Installation Started</h5><p>Installation Log:</p>"+
     "<p id='cmdDisplayer'></p>"+
+    "<div class='progress-bar bg-success' role='progressbar' aria-valuenow='25' aria-valuemin='25' aria-valuemax='100' id='installProgress'></div>"+
     "<select name='domainSelect' id='domainSelect'></select>"+
     "<textarea id='sshLog' cols='30' rows='10' disabled></textarea>";   
 
     sshLogObject = document.getElementById("sshLog");
-
     var commandDisplayer = document.getElementById("cmdDisplayer");
     domainSelector = document.getElementById("domainSelect");
 

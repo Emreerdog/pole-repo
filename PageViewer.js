@@ -139,6 +139,11 @@ class PolePageViewer{
     {
         this.#nextButton.innerHTML = value;
     }
+    DisableFooterPart()
+    {
+        var footerButtons = document.getElementById("footerButtons");
+        footerButtons.style.display = "none";
+    }
 }
 
 module.exports = PolePageViewer;

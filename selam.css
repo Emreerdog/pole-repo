@@ -56,6 +56,7 @@ html {
 #sshLog {
   color: black;
   font-size: smaller;  
+  margin-bottom: 10px;
 }
 
   #pathRemoveButton {
@@ -187,4 +188,15 @@ html {
   #leftPart{
     background-color: black;
     z-index: -100;
+  }
+
+  #installProgress{
+    width: 40%;
+    border-radius: 0px;
+    height: 20px;
+    margin-bottom: 5px;
+  }
+
+  #cmdDisplayer{
+    line-height: 1;
   }
