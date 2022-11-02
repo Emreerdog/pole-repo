@@ -5,7 +5,7 @@ var PreLoad = function(contentState)
 
     contentState.pageContentState["SelectedComponents"] = new Array();
 
-    for(var i = 0; i < 20; i++)
+    for(var i = 0; i < 19; i++)
     {
         var compObject = document.getElementById("comp" + i);
         console.log(compObject.checked);

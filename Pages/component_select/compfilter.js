@@ -16,7 +16,7 @@ var OnLoad = function(contentState)
         contentState.pageContentState["ComponentList"] = new Array();
     }
 
-    for(var i = 0; i < 20; i++)
+    for(var i = 0; i < 19; i++)
     {
         var compObject = document.getElementById("comp" + i);
         if(contentState.pageContentState["SelectedComponents"] == undefined)

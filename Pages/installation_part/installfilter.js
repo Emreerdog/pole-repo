@@ -7,10 +7,10 @@ var sshLogObject;
 var domainSelector;
 var workingDomain;
 
-function UpdatePercentage() {
-    var currentVal = (100 * globalCommandCounter) / (sshCommandList.length * totalDomainInputs.length);
-    document.getElementById("installProgress").style.width = currentVal + '%';
-} 
+// function UpdatePercentage() {
+//     var currentVal = (100 * globalCommandCounter) / (sshCommandList.length * totalDomainInputs.length);
+//     document.getElementById("installProgress").style.width = currentVal + '%';
+// } 
  
 
 function LogSelection()
@@ -47,7 +47,7 @@ function ExecuteRecursive(connectionInstance)
             }
 
         globalCommandCounter++;
-        UpdatePercentage();
+        //UpdatePercentage();
         connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
         connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
         sshLogObject.value = workingDomain.outputLog;
@@ -141,7 +141,7 @@ var OnLoad = function(contentState)
     "bigtop::hadoop_head_node: \"" + givenMasterNode + "\"\n"+
     "hadoop::hadoop_storage_dirs:\n"+
     storageDirectories +
-    "hadoop_cluster_node::cluster_components:\n- hdfs\n"+ componentsString +
+    "hadoop_cluster_node::cluster_components:\n- hdfs\n- zookeeper\n"+ componentsString +
     "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
     "bigtop::bigtop_repo_uri: \"" + givenRepoUrl + "\"\nEOF\n\"";
 
