@@ -25,6 +25,10 @@
 			"content" : "./Pages/path_select/path_select.html"
 		},
 		{
+			"filter" : "./Pages/name_select/namefilter.js",
+			"content" : "./Pages/name_select/name_select.html"
+		},
+		{
 			"filter" : "./Pages/installation_part/installfilter.js",
 			"content" : "./Pages/installation_part/install_part.html"
 		}

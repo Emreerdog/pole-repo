@@ -21,7 +21,6 @@ var OnLoad = function(contentState)
     var removePathButton = document.getElementById("pathRemoveButton");
     var pathContainer = document.getElementById("textContainer");
     var ourPaths = pathContainer.children;
-    contentState.SetButtonText("Install");
     addPathButton.addEventListener('click', () => {
         var newPath = document.createElement("input");
         newPath.type = "text";
