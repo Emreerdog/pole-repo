@@ -1,0 +1,32 @@
+{
+	"pagelist" : [ 
+		{	
+			"filter" : "",
+			"content" : "./Pages/intro_page/hello_page.html"
+		},
+		{
+			"filter" : "./Pages/domain_select/domain_select_filter.js",
+			"content" : "./Pages/domain_select/domain_select.html"
+		},
+		{
+			"filter" : "./Pages/master_select/masterfilter.js",
+			"content" : "./Pages/master_select/masterselect.html"
+		},
+		{
+			"filter" : "./Pages/component_select/compfilter.js",
+			"content" : "./Pages/component_select/comp_select.html"
+		},
+		{
+			"filter" : "./Pages/url_select/urlfilter.js",
+			"content" : "./Pages/url_select/url_pick.html"
+		},
+		{
+			"filter" : "./Pages/path_select/pathfilter.js",
+			"content" : "./Pages/path_select/path_select.html"
+		},
+		{
+			"filter" : "./Pages/installation_part/installfilter.js",
+			"content" : "./Pages/installation_part/install_part.html"
+		}
+	]
+}

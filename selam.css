@@ -18,6 +18,10 @@ html {
     height: 90%;
   }
   
+  #domainSelect{
+    margin-bottom: 10px;
+  }
+
   #poleLogo {
     margin-right: 0px;
     width: 100%;
@@ -49,6 +53,12 @@ html {
     width: 40px;
   }
   
+#sshLog {
+  color: black;
+  font-size: smaller;  
+  margin-bottom: 10px;
+}
+
   #pathRemoveButton {
     float: right;
     width: 40px;
@@ -178,4 +188,15 @@ html {
   #leftPart{
     background-color: black;
     z-index: -100;
+  }
+
+  #installProgress{
+    width: 40%;
+    border-radius: 0px;
+    height: 20px;
+    margin-bottom: 5px;
+  }
+
+  #cmdDisplayer{
+    line-height: 1;
   }
