@@ -1,5 +1,6 @@
 const { NodeSSH } = require("node-ssh");
 
+var totalDomainInputs;
 var sshCommandList = new Array();
 var globalCommandCounter = 0;
 var connectionInfoObjects = new Array();
@@ -7,10 +8,12 @@ var sshLogObject;
 var domainSelector;
 var workingDomain;
 
-// function UpdatePercentage() {
-//     var currentVal = (100 * globalCommandCounter) / (sshCommandList.length * totalDomainInputs.length);
-//     document.getElementById("installProgress").style.width = currentVal + '%';
-// } 
+function UpdatePercentage() {
+    const totalLength = (sshCommandList.length * totalDomainInputs.length)
+    var currentVal = (100 * globalCommandCounter) / totalLength;
+    document.getElementById("installProgress").style.width = currentVal + '%';
+    document.getElementById("cmdDisplayer").innerHTML = globalCommandCounter + '/' + totalLength;
+} 
  
 
 function LogSelection()
@@ -47,7 +50,7 @@ function ExecuteRecursive(connectionInstance)
             }
 
         globalCommandCounter++;
-        //UpdatePercentage();
+        UpdatePercentage();
         connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
         connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
         sshLogObject.value = workingDomain.outputLog;
@@ -81,17 +84,6 @@ function ShellExecutor()
     }
 }
 
-function ConnectionValidation()
-{
-    for(var i = 0; i < connectionInfoObjects.length; i++)
-    {
-        if(connectionInfoObjects[i].selfSsh.isConnected() == false)
-        {
-            
-        }
-    }
-}
-
 var PreLoad = function(contentState)
 {
     var pathContainer = document.getElementById("textContainer");
@@ -116,7 +108,7 @@ var PreLoad = function(contentState)
 var OnLoad = function(contentState)
 {
     const totalComponents = contentState.pageContentState["SelectedComponents"]; // ARRAY
-    const totalDomainInputs = contentState.pageContentState["DomainInputs"]; // ARRAY
+    totalDomainInputs = contentState.pageContentState["DomainInputs"]; // ARRAY
     const totalPathInputs = contentState.pageContentState["PathInput"]; // ARRAY
 
     const givenRepoUrl = contentState.pageContentState["SelectedUrl"]; // STRING
@@ -233,7 +225,7 @@ var OnLoad = function(contentState)
     }
 
     setTimeout(ShellExecutor, 3000);
-
+    
     commandDisplayer.innerHTML = globalCommandCounter + "/" + commandCount;
 
     // Do all the ssh thing
