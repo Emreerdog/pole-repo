@@ -86,7 +86,38 @@ function ShellExecutor()
 
 var PreLoad = function(contentState)
 {
+    if(contentState.pageContentState["SSHMethod"] == undefined)
+    {
+        return 1;
+    }
 
+    if(contentState.pageContentState["SSHMethod"] == 0)
+    {
+        var sshUser = document.getElementById("sshUsername");
+        var sshPass = document.getElementById("sshPassword");
+        var logSection = document.getElementById("logMessage");
+
+        if(sshUser.value == "")
+        {
+            logSection.innerHTML = "*Name field can not be blank";
+            logSection.style.display = "block";
+            return 1;
+        }
+
+        if(sshPass.value == "")
+        {
+            logSection.innerHTML = "*Password field can not be blank";
+            logSection.style.display = "block";
+            return 1;
+        }
+        contentState.pageContentState["SSHUsername"] = sshUser.value;
+        contentState.pageContentState["SSHPassword"] = sshPass.value;
+    }
+
+    else
+    {
+
+    }
     return 0;
 }
 
@@ -187,13 +218,14 @@ var OnLoad = function(contentState)
 
     workingDomain = connectionInfoObjects[0];
 
-    var password = "1234";
+    const uNAME = contentState.pageContentState["SSHUsername"];
+    const password = contentState.pageContentState["SSHPassword"];
 
     for(var i = 0; i < connectionInfoObjects.length; i++)
     {
         var myConfig = {
             host : connectionInfoObjects[i].hostInfo,
-            username: 'root',
+            username: uNAME,
             port: 22,
             password,
             tryKeyboard: false

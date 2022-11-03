@@ -191,7 +191,7 @@ html {
   }
 
   #installProgress{
-    width: 40%;
+    width: 0%;
     border-radius: 0px;
     height: 20px;
     margin-bottom: 5px;

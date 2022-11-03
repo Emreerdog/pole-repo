@@ -21,9 +21,29 @@ var PreLoad = function(contentState)
 
 var OnLoad = function(contentState)
 {
+    var methodSelection = document.getElementById("sshMethod");
+    var credContainer = document.getElementById("credentialsContainer");
+    var keyContainer = document.getElementById("sshFileContainer");
+    
+    keyContainer.style.display = "none";
+
+    contentState.pageContentState["SSHMethod"] = 0;
+    methodSelection.onchange = function () {
+        
+        if(methodSelection.value == "Credentials")
+        {
+            keyContainer.style.display = "none";
+            credContainer.style.display = "block";
+            contentState.pageContentState["SSHMethod"] = 0;
+        }
+        else{
+            credContainer.style.display = "none";
+            keyContainer.style.display = "block";
+            contentState.pageContentState["SSHMethod"] = 1;
+        }
+    }
     contentState.SetButtonText("Install");
 }
 
 var exportFunctions = [PreLoad, OnLoad];
-
 module.exports = exportFunctions;

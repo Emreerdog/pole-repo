@@ -2,12 +2,12 @@ var PreLoad = function(contentState)
 {
     // If it returns 0
     // We can proceed
-    
     return 0;
 }
 
 var OnLoad = function(contentState)
 {
+
     var addDomainButton = document.getElementById("domainAdd");
     var removeDomainButton = document.getElementById("rmvButton");
     var domainContainer = document.getElementById("textContainer");
