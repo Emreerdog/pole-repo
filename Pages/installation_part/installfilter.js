@@ -8,14 +8,18 @@ var sshLogObject;
 var domainSelector;
 var workingDomain;
 
-function UpdatePercentage() {
+function RemainingPercentage()
+{
     const totalLength = (sshCommandList.length * totalDomainInputs.length)
     var currentVal = (100 * globalCommandCounter) / totalLength;
-    document.getElementById("installProgress").style.width = currentVal + '%';
+    return currentVal;
+}
+
+function UpdatePercentage() {
+    document.getElementById("installProgress").style.width = RemainingPercentage() + '%';
     document.getElementById("cmdDisplayer").innerHTML = globalCommandCounter + '/' + totalLength;
 } 
  
-
 function LogSelection()
 {
     var outDomain = domainSelector.value;

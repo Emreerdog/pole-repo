@@ -43,6 +43,7 @@ class PolePageViewer{
                     // preLoadScript = pageDescriptor.filterScript.PreLoad(undefined);
                 }
                 pageDescriptor.contentString = fileSystem.readFileSync(this.#contentData.pagelist[i].content);
+                //pageDescriptor.contentString = this.#contentData.pagelist[i].content;
                 this.#pageList.push(pageDescriptor);
             } catch(err){
                 console.log(err);

@@ -41,19 +41,28 @@ var PreLoad = function(contentState)
         }
         contentState.pageContentState["DomainInputs"].push(inputDomains[i].value);
     }
-    console.log("what");
+
     return 0;
 }
 
 var OnLoad = function(contentState)
 {
     var masterNodeSelector = document.getElementById("masterSelect");
+    console.log(contentState.pageContentState["MasterNode"]);
+    
     for(var i = 0; i < contentState.pageContentState["DomainInputs"].length; i++)
     {
         var optionElement = document.createElement("option");
+        optionElement.value = contentState.pageContentState["DomainInputs"][i];
         optionElement.innerHTML = contentState.pageContentState["DomainInputs"][i];
         masterNodeSelector.appendChild(optionElement);
+        
     }
+
+    if(contentState.pageContentState["MasterNode"] != undefined)
+        {
+            masterNodeSelector.value = contentState.pageContentState["MasterNode"];
+        }
 }
 
 var exportFunctions = [PreLoad, OnLoad];
