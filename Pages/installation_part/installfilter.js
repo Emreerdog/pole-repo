@@ -16,6 +16,7 @@ function RemainingPercentage()
 }
 
 function UpdatePercentage() {
+    const totalLength = (sshCommandList.length * totalDomainInputs.length)
     document.getElementById("installProgress").style.width = RemainingPercentage() + '%';
     document.getElementById("cmdDisplayer").innerHTML = globalCommandCounter + '/' + totalLength;
 } 
