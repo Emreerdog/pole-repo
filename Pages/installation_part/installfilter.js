@@ -153,9 +153,11 @@ var OnLoad = function(contentState)
     "bigtop::hadoop_head_node: \"" + givenMasterNode + "\"\n"+
     "hadoop::hadoop_storage_dirs:\n"+
     storageDirectories +
-    "hadoop_cluster_node::cluster_components:\n- hdfs\n- zookeeper\n"+ componentsString +
+    "hadoop_cluster_node::cluster_components:\n- hdfs-non-ha\n- zookeeper\n"+ componentsString +
     "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
     "bigtop::bigtop_repo_uri: \"" + givenRepoUrl + "\"\nEOF\n\"";
+
+    console.log(variadicCommand);
 
     contentState.DisableFooterPart();
 
@@ -175,21 +177,22 @@ var OnLoad = function(contentState)
     sshCommandList.push(variadicCommand);
     sshCommandList.push("/opt/puppetlabs/bin/puppet apply --hiera_config=/etc/puppet/hiera.yaml --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules:/usr/share/puppet/modules:/etc/puppetlabs/code/environments/production/modules /bigtop-home/bigtop-deploy/puppet/manifests");
     sshCommandList.push("sleep 5");
-    sshCommandList.push("chown hdfs:hdfs /home/data/")
-    sshCommandList.push("echo Necessary ports for each host:");
-    sshCommandList.push("echo ----------------");
-    sshCommandList.push("echo Default File System Link:");
-    sshCommandList.push("hdfs getconf -confKey fs.defaultFS");
-    sshCommandList.push("echo ----------------");
-    sshCommandList.push("echo Yarn NodeManager Address");
-    sshCommandList.push("hdfs getconf -confKey yarn.nodemanager.webapp.address");
-    sshCommandList.push("echo ----------------");
-    sshCommandList.push("echo DataNode Address");
-    sshCommandList.push("hdfs getconf -confKey dfs.datanode.http.address");
-    sshCommandList.push("echo ----------------");
-    sshCommandList.push("echo NameNode Address");
-    sshCommandList.push("hdfs getconf -confKey dfs.namenode.http-address");
-    sshCommandList.push("echo ----------------");
+    sshCommandList.push("echo Install finished.");
+    // sshCommandList.push("chown hdfs:hdfs /home/data/")
+    // sshCommandList.push("echo Necessary ports for each host:");
+    // sshCommandList.push("echo ----------------");
+    // sshCommandList.push("echo Default File System Link:");
+    // sshCommandList.push("hdfs getconf -confKey fs.defaultFS");
+    // sshCommandList.push("echo ----------------");
+    // sshCommandList.push("echo Yarn NodeManager Address");
+    // sshCommandList.push("hdfs getconf -confKey yarn.nodemanager.webapp.address");
+    // sshCommandList.push("echo ----------------");
+    // sshCommandList.push("echo DataNode Address");
+    // sshCommandList.push("hdfs getconf -confKey dfs.datanode.http.address");
+    // sshCommandList.push("echo ----------------");
+    // sshCommandList.push("echo NameNode Address");
+    // sshCommandList.push("hdfs getconf -confKey dfs.namenode.http-address");
+    // sshCommandList.push("echo ----------------");
 
 
     var myContent = document.getElementById("contentContainer");
