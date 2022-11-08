@@ -7,6 +7,7 @@ class PolePageViewer{
     #pageList = new Array();
 
     pageContentState = new Array();
+    services = new Array();
 
     constructor(page_config, fieldId, nextId, prevId)
     {
@@ -42,6 +43,7 @@ class PolePageViewer{
                     // loadScript = pageDescriptor.filterScript.OnLoad(undefined);
                     // preLoadScript = pageDescriptor.filterScript.PreLoad(undefined);
                 }
+                
                 pageDescriptor.contentString = fileSystem.readFileSync(this.#contentData.pagelist[i].content);
                 //pageDescriptor.contentString = this.#contentData.pagelist[i].content;
                 this.#pageList.push(pageDescriptor);
@@ -51,6 +53,14 @@ class PolePageViewer{
             
         }
 
+        
+
+        for(var i = 0; i < this.#contentData.serviceInfos.length; i++)
+        {
+            var serviceInformation = {service : this.#contentData.serviceInfos[i].service, port :  this.#contentData.serviceInfos[i].port, level :  this.#contentData.serviceInfos[i].level};
+            this.services.push(serviceInformation);
+        }
+
         if(this.#pageList.length == 1 || this.#pageList.length == 0)
         {
             this.#nextButton.disabled = true;
@@ -58,6 +68,7 @@ class PolePageViewer{
 
         this.#documentField.innerHTML = this.#pageList[0].contentString;
         this.#pageIndex = 1;
+
     }
 
     NextPage()
@@ -140,6 +151,29 @@ class PolePageViewer{
     {
         this.#nextButton.innerHTML = value;
     }
+
+    ButtonSetState(which, state)
+    {
+        if(which == "back")
+        {
+            this.#previousButton.disabled = state;
+            return 0;
+        }
+
+        else if(which == "next")
+        {
+            this.#nextButton.disabled = state;
+            return 0;
+        }
+
+        return 1;
+    }
+
+    Reload()
+    {
+        this.#documentField = document.getElementById("contentPart");
+    }
+
     DisableFooterPart()
     {
         var footerButtons = document.getElementById("footerButtons");

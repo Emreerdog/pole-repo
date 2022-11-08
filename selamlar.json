@@ -1,4 +1,42 @@
-{
+{	
+	"serviceInfos" : [
+		{
+			"service" : "Data Node Manager",
+			"port" : 9864,
+			"level" : 0
+		},
+		{
+			"service" : "Name Node Manager",
+			"port" : 50070,
+			"level" : 1
+		},
+		{
+			"service" : "ZooKeeper",
+			"port" : 2181,
+			"level" : 0
+		},
+		{
+			"service" : "Region Server",
+			"port" : 16020,
+			"level" : 0
+		},
+		{
+			"service" : "HMaster",
+			"port" : 16010,
+			"level" : 1
+		},
+		{
+			"service" : "Resource Manager",
+			"port" : 8088,
+			"level" : 1
+		},
+		{
+			"service" : "Node Manager",
+			"port" : 8042,
+			"level" : 0
+		}
+	],
+
 	"pagelist" : [ 
 		{	
 			"filter" : "",
@@ -31,6 +69,11 @@
 		{
 			"filter" : "./Pages/installation_part/installfilter.js",
 			"content" : "./Pages/installation_part/install_part.html"
+		},
+		{
+			"filter" : "./Pages/life_check/lifecheck.js",
+			"content" : "./Pages/life_check/life_check.html"
 		}
 	]
+
 }

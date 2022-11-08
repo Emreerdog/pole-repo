@@ -10,12 +10,13 @@ var workingDomain;
 
 function RemainingPercentage()
 {
-    const totalLength = (sshCommandList.length * totalDomainInputs.length)
+    const totalLength = (sshCommandList.length * totalDomainInputs.length);
     var currentVal = (100 * globalCommandCounter) / totalLength;
     return currentVal;
 }
 
 function UpdatePercentage() {
+    const totalLength = (sshCommandList.length * totalDomainInputs.length);
     document.getElementById("installProgress").style.width = RemainingPercentage() + '%';
     document.getElementById("cmdDisplayer").innerHTML = globalCommandCounter + '/' + totalLength;
 } 
@@ -55,6 +56,11 @@ function ExecuteRecursive(connectionInstance)
 
         globalCommandCounter++;
         UpdatePercentage();
+        if(RemainingPercentage() == 100)
+        {
+            contentState.ButtonSetState("back", true);
+            contentState.ButtonSetState("next", false);
+        }
         connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
         connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
         sshLogObject.value = workingDomain.outputLog;
@@ -196,6 +202,7 @@ var OnLoad = function(contentState)
 
 
     var myContent = document.getElementById("contentContainer");
+
     myContent.style.marginLeft = "10px";
     myContent.innerHTML = "<h5>Installation Started</h5><p>Installation Log:</p>"+
     "<p id='cmdDisplayer'></p>"+
@@ -241,17 +248,16 @@ var OnLoad = function(contentState)
         const cnInfo = connectionInfoObjects[i];
 
         connectionInfoObjects[i].selfSsh.connect(myConfig).then(function(){
-            console.log("Hello world");
-            console.log(myConfig);
             cnInfo.outputLog += "Connection Established\n";
             sshLogObject.value = workingDomain.outputLog;
         });
     }
-
+    contentState.ButtonSetState("back", true);
+    contentState.ButtonSetState("next", false);
+    contentState.SetButtonText("Check");
     setTimeout(ShellExecutor, 3000);
-    
     commandDisplayer.innerHTML = globalCommandCounter + "/" + commandCount;
-
+    
     // Do all the ssh thing
 }
 

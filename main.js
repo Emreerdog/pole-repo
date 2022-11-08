@@ -14,6 +14,7 @@ const createWindow = () => {
     win.setResizable(false);
     win.loadFile('index.html');
     win.setMenu(null);
+    
 }
 
 app.whenReady().then(() => {
