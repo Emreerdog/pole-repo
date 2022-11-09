@@ -11,7 +11,6 @@ var myContentState;
 
 function RemainingPercentage()
 {
-    const totalLength = (sshCommandList.length * totalDomainInputs.length);
     var currentVal = (100 * globalCommandCounter) / totalLength;
     return currentVal;
 }
@@ -57,6 +56,7 @@ function ExecuteRecursive(connectionInstance)
 
         globalCommandCounter++;
         UpdatePercentage();
+        const totalLength = (sshCommandList.length * totalDomainInputs.length);
         if(totalLength / globalCommandCounter == 1)
         {
             myContentState.ButtonSetState("back", true);
