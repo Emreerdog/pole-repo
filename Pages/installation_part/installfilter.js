@@ -56,7 +56,7 @@ function ExecuteRecursive(connectionInstance)
 
         globalCommandCounter++;
         UpdatePercentage();
-        if(RemainingPercentage() == 100)
+        if(totalLength / globalCommandCounter == 1)
         {
             contentState.ButtonSetState("back", true);
             contentState.ButtonSetState("next", false);
@@ -126,7 +126,18 @@ var PreLoad = function(contentState)
 
     else
     {
+        var keyLocation = document.getElementById("keyFileInput").files[0];
+        if(keyLocation == "")
+        {
+            logSection.innerHTML = "*Key file must be supplied";
+            logSection.style.display = "block";
+            return 1;
+        }
 
+        var fReader = new FileReader();
+        fReader.readAsBinaryString(document.getElementById("keyFileInput").files[0]);
+        contentState.pageContentState["SSHFile"] = keyLocation;
+        console.log(contentState.pageContentState["SSHFile"]);
     }
     return 0;
 }

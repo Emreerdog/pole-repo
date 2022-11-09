@@ -5,19 +5,21 @@ const createWindow = () => {
       height: 400,
       useContentSize: true,
       webPreferences: {
+        preload: "./preload.js",
         nodeIntegration: true,
         contextIsolation: false,
       },
       icon: './icon.png'
     })
+    
     win.openDevTools();
     win.setResizable(false);
     win.loadFile('index.html');
     win.setMenu(null);
-    
 }
 
 app.whenReady().then(() => {
     createWindow();
+    
 })
   

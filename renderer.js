@@ -1,5 +1,4 @@
 const fs = require('fs');
-
 const POLEVIEWER = require('./PageViewer');
 var fileCont = fs.readFileSync("selamlar.json", 'utf-8');
 

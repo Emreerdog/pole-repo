@@ -2,9 +2,6 @@ var PreLoad = function(contentState)
 {
     // If it returns 0
     // We can proceed
-    
-    console.log("Hahaha");
-    
 
     return 0;
 }
