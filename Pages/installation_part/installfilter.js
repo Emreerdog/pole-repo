@@ -1,9 +1,9 @@
 const { NodeSSH } = require("node-ssh");
 
 var totalDomainInputs;
-var sshCommandList = new Array();
-var globalCommandCounter = 0;
-var connectionInfoObjects = new Array();
+var sshCommandList;
+var globalCommandCounter;
+var connectionInfoObjects;
 var sshLogObject;
 var domainSelector;
 var workingDomain;
@@ -140,6 +140,12 @@ var OnLoad = function(contentState)
     const givenRepoUrl = contentState.pageContentState["SelectedUrl"]; // STRING
     const givenMasterNode = contentState.pageContentState["MasterNode"]; // STRING
 
+    sshCommandList = new Array();
+    globalCommandCounter = 0;
+    connectionInfoObjects = new Array();
+    sshLogObject = undefined;
+    domainSelector = undefined;
+    workingDomain = undefined
 
     var componentsString = "";
     for(var i = 0; i < totalComponents.length; i++)
@@ -253,8 +259,9 @@ var OnLoad = function(contentState)
         });
     }
     contentState.ButtonSetState("back", true);
-    contentState.ButtonSetState("next", false);
+    contentState.ButtonSetState("next", true);
     contentState.SetButtonText("Check");
+    
     setTimeout(ShellExecutor, 3000);
     commandDisplayer.innerHTML = globalCommandCounter + "/" + commandCount;
     

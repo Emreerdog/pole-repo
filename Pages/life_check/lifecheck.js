@@ -41,7 +41,7 @@ var OnLoad = function(contentState)
     {
       var ourElement = document.getElementById("controlBlock");
       
-      var hostSelect = document.createElement("p");
+      var hostSelect = document.createElement("small");
       hostSelect.innerHTML = "Host (" + totalComponents[i] + ")<br>";
       ourElement.appendChild(hostSelect);
       for(var j = 0; j < contentState.services.length; j++)
@@ -61,7 +61,8 @@ var OnLoad = function(contentState)
       {
         const checkThis = contentState.services[j];
         const checkIndex = j;
-        const newSocket = netlib.connect({host : totalComponents[checkIndex], port : checkThis.port});
+        const compIndex = i;
+        const newSocket = netlib.connect({host : totalComponents[compIndex], port : checkThis.port});
         newSocket.on("connect", () => {
             var controlElement = document.getElementById("control" + checkIndex);
             controlElement.innerHTML = "&#128994 " + checkThis.service + "<br>";

@@ -3,14 +3,7 @@ var PreLoad = function(contentState)
     // If it returns 0
     // We can proceed
     
-    console.log(contentState.services);
-
-    const netlib = require("net");
-    
-    const newSocket = netlib.connect({host : "google.com", port : 443});
-    newSocket.on("connect", () => {
-      console.log("sea");
-    })
+    console.log("Hahaha");
     
 
     return 0;
