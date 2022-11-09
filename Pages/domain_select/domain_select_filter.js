@@ -2,6 +2,9 @@ var PreLoad = function(contentState)
 {
     // If it returns 0
     // We can proceed
+    
+   
+    console.log(window.myAPI);
 
     return 0;
 }

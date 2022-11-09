@@ -7,6 +7,7 @@ var connectionInfoObjects;
 var sshLogObject;
 var domainSelector;
 var workingDomain;
+var myContentState;
 
 function RemainingPercentage()
 {
@@ -58,8 +59,8 @@ function ExecuteRecursive(connectionInstance)
         UpdatePercentage();
         if(totalLength / globalCommandCounter == 1)
         {
-            contentState.ButtonSetState("back", true);
-            contentState.ButtonSetState("next", false);
+            myContentState.ButtonSetState("back", true);
+            myContentState.ButtonSetState("next", true);
         }
         connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
         connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
@@ -144,6 +145,7 @@ var PreLoad = function(contentState)
 
 var OnLoad = function(contentState)
 {
+    myContentState = contentState;
     totalDomainInputs = contentState.pageContentState["DomainInputs"]; // ARRAY
     const totalComponents = contentState.pageContentState["SelectedComponents"]; // ARRAY
     const totalPathInputs = contentState.pageContentState["PathInput"]; // ARRAY
