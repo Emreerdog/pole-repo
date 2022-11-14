@@ -2,5 +2,17 @@
 <small class='text-danger' id='logMessage'>*Repo field can not be blank</small>
 <p>Please add Bigtop Repo URL.</p>
 <p>(You can change OS for installation. It comes RockyLinux 8 default.)</p>
-<label for='repoUrl'>Enter Bigtop Repo URL: </label>
-<input type='text' id='repoUrl' name='repoUrl' class='w-100' value='http://repos.bigtop.apache.org/releases/3.1.1/rockylinux/8/x86_64'>
+<label>Choose OS for Cluster.</label><br>
+<select name='repoUrl' id='repoUrl'>
+    <option selected="selected" value="http://repos.bigtop.apache.org/releases/3.1.1/rockylinux/8/x86_64">RockyLinux 8</option>
+    <option value="http://repos.bigtop.apache.org/releases/3.1.1/ubuntu/20.04/x86_64">Ubuntu 20.04</option>
+    <option value="http://repos.bigtop.apache.org/releases/3.1.1/fedora/35/x86_64">Fedora 35</option>
+    <option value="http://repos.bigtop.apache.org/releases/3.1.1/debian/11/x86_64">Debian 11</option>
+</select><br><br>
+<input type='checkbox' id='checkbut' name='checkbut' checked='false'>
+<label for='path'>Advanced</label>
+
+
+
+<!-- <label for='repoUrl' hidden>Enter Bigtop Repo URL: </label> -->
+<input disabled type='text' id='repoUrlText' name='repoUrlText' class='w-100' value='http://repos.bigtop.apache.org/releases/3.1.1/rockylinux/8/x86_64'> 
