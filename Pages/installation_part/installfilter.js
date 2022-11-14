@@ -204,22 +204,6 @@ var OnLoad = function(contentState)
     sshCommandList.push("/opt/puppetlabs/bin/puppet apply --hiera_config=/etc/puppet/hiera.yaml --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules:/usr/share/puppet/modules:/etc/puppetlabs/code/environments/production/modules /bigtop-home/bigtop-deploy/puppet/manifests");
     sshCommandList.push("sleep 5");
     sshCommandList.push("echo Install finished.");
-    // sshCommandList.push("chown hdfs:hdfs /home/data/")
-    // sshCommandList.push("echo Necessary ports for each host:");
-    // sshCommandList.push("echo ----------------");
-    // sshCommandList.push("echo Default File System Link:");
-    // sshCommandList.push("hdfs getconf -confKey fs.defaultFS");
-    // sshCommandList.push("echo ----------------");
-    // sshCommandList.push("echo Yarn NodeManager Address");
-    // sshCommandList.push("hdfs getconf -confKey yarn.nodemanager.webapp.address");
-    // sshCommandList.push("echo ----------------");
-    // sshCommandList.push("echo DataNode Address");
-    // sshCommandList.push("hdfs getconf -confKey dfs.datanode.http.address");
-    // sshCommandList.push("echo ----------------");
-    // sshCommandList.push("echo NameNode Address");
-    // sshCommandList.push("hdfs getconf -confKey dfs.namenode.http-address");
-    // sshCommandList.push("echo ----------------");
-
 
     var myContent = document.getElementById("contentContainer");
 

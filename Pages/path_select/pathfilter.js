@@ -3,7 +3,17 @@ var PreLoad = function(contentState)
     // If it returns 0
     // We can proceed
 
-    var urlField = document.getElementById("repoUrl");
+    var urlField;
+    var chBox = document.getElementById("advanceCheck");
+    if(chBox.checked == true)
+    {
+        urlField = document.getElementById("repoUrlText");
+    }
+    else
+    {
+        urlField = document.getElementById("repoUrl");
+    }
+    
     if(urlField.value == "")
     {
         var lgMsg = document.getElementById("logMessage");
@@ -11,6 +21,9 @@ var PreLoad = function(contentState)
         return 1;
     }
 
+    console.log(urlField.value);
+
+    contentState.pageContentState["AdvanceChecked"] = chBox.checked;
     contentState.pageContentState["SelectedUrl"] = urlField.value;
     return 0;
 }

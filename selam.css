@@ -202,3 +202,7 @@ html {
   #cmdDisplayer{
     line-height: 1;
   }
+
+  #repoUrlText{
+    display: none;
+  }

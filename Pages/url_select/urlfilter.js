@@ -27,11 +27,47 @@ var PreLoad = function(contentState)
 
 var OnLoad = function(contentState)
 {
+    var repoField = document.getElementById("repoUrlText");
     var urlField = document.getElementById("repoUrl");
+
+    urlField.onchange = function () {
+        repoField.value = urlField.value;
+    }
+
+    var advanceCheck = document.getElementById("advanceCheck");
+
+    advanceCheck.onclick = function (){
+        contentState.pageContentState["AdvanceChecked"] = advanceCheck.checked;
+        if(contentState.pageContentState["AdvanceChecked"] == true)
+        {
+            repoField.style.display = "block";
+            repoField.value = urlField.value;
+        }
+
+        else
+        {
+            repoField.style.display = "none";
+        }
+    }
+
+    if(contentState.pageContentState["AdvanceChecked"] != undefined)
+    {
+        if(contentState.pageContentState["AdvanceChecked"] == true)
+        {
+            repoField.style.display = "block";
+            advanceCheck.checked = true;
+        }
+
+        else
+        {
+            repoField.style.display = "none";
+        }
+    }
 
     if(contentState.pageContentState["SelectedUrl"] != undefined)
     {
         urlField.value = contentState.pageContentState["SelectedUrl"];
+        repoField.value = contentState.pageContentState["SelectedUrl"];
     }
 }
 
