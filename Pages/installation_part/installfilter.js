@@ -191,7 +191,7 @@ var OnLoad = function(contentState)
     sshCommandList.push("sudo rpm -ivh http://yum.puppetlabs.com/puppet5-release-el-8.noarch.rpm");
     sshCommandList.push("sudo yum -y install puppet");
     sshCommandList.push("/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 4.12.0");
-    sshCommandList.push("sudo git clone https://github.com/apache/bigtop.git /bigtop-home");
+    sshCommandList.push("sudo git clone https://github.com/beartell/bigtop.git /bigtop-home");
     sshCommandList.push("sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"");
     sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
     sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
