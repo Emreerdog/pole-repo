@@ -21,5 +21,4 @@ scrape_configs:
   - job_name: 'datanodes'
     scrape_interval: 5s
     static_configs:
-      - targets: ['bd01.beartell.com:27002','bd02.beartell.com:27002','bd03.beartell.com:27002' ]
-
+      - targets: ['bd01.beartell.com:27002','bd02.beartell.com:27002','bd03.beartell.com:27002']
