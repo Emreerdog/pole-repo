@@ -8,7 +8,6 @@ var PreLoad = function(contentState)
     for(var i = 0; i < 19; i++)
     {
         var compObject = document.getElementById("comp" + i);
-        console.log(compObject.checked);
         if(compObject.checked == true)
         {
             contentState.pageContentState["SelectedComponents"].push(compObject.value);

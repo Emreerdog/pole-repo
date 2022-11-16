@@ -3,8 +3,6 @@ var PreLoad = function(contentState)
     // If it returns 0
     // We can proceed
     
-   
-    console.log(window.myAPI);
 
     return 0;
 }
@@ -54,12 +52,11 @@ var OnLoad = function(contentState)
     var domainRows = domainContainer.children;
     domainRows[0].value = contentState.pageContentState["DomainInputs"][0];
 
-    console.log(contentState.pageContentState["DomainInputs"]);
+
 
     for(var i = 1; i < inputCount; i++)
     {
         var domainInputString = contentState.pageContentState["DomainInputs"][i];
-        console.log(domainInputString);
         var newDomain = document.createElement("input");
         newDomain.type = "text";
         newDomain.className = "w-100 mb-1";
