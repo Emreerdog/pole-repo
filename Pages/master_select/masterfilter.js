@@ -48,7 +48,6 @@ var PreLoad = function(contentState)
 var OnLoad = function(contentState)
 {
     var masterNodeSelector = document.getElementById("masterSelect");
-    console.log(contentState.pageContentState["MasterNode"]);
     
     for(var i = 0; i < contentState.pageContentState["DomainInputs"].length; i++)
     {

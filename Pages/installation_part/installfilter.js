@@ -139,7 +139,6 @@ var PreLoad = function(contentState)
         var fReader = new FileReader();
         fReader.readAsBinaryString(document.getElementById("keyFileInput").files[0]);
         contentState.pageContentState["SSHFile"] = keyLocation;
-        console.log(contentState.pageContentState["SSHFile"]);
     }
     return 0;
 }
@@ -182,8 +181,6 @@ var OnLoad = function(contentState)
     "hadoop_cluster_node::cluster_components:\n- hdfs-non-ha\n- zookeeper\n"+ componentsString +
     "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
     "bigtop::bigtop_repo_uri: \"" + givenRepoUrl + "\"\nEOF\n\"";
-
-    console.log(variadicCommand);
 
     contentState.DisableFooterPart();
 
@@ -256,9 +253,9 @@ var OnLoad = function(contentState)
             sshLogObject.value = workingDomain.outputLog;
         });
     }
-    contentState.ButtonSetState("back", true);
-    contentState.ButtonSetState("next", true);
-    contentState.SetButtonText("Check");
+    // contentState.ButtonSetState("back", true);
+    // contentState.ButtonSetState("next", true);
+    // contentState.SetButtonText("Check");
     
     setTimeout(ShellExecutor, 3000);
     commandDisplayer.innerHTML = globalCommandCounter + "/" + commandCount;

@@ -15,24 +15,12 @@ var PreLoad = function(contentState)
     contentState.Reload();
     containerDisplay.style.marginLeft = "0px";
 
-    // const netlib = require("net");
-
-    // const newSocket = netlib.connect({host : "rocky1", port : 443});
-    // newSocket.on("connect", (stream) => {
-    //   console.log("We are connected");
-    // })
-
-
     return 0;
-}
-
-function myFunc()
-{
-  console.log("hello");
 }
 
 var OnLoad = function(contentState)
 {
+    var factor = 0;
     const netlib = require("net");
     // contentState.ButtonSetState("back", true);
     contentState.SetButtonText("Finish");
@@ -50,10 +38,14 @@ var OnLoad = function(contentState)
         const checkIndex = j;
         var newText = document.createElement("small");
         newText.innerHTML = "&#x1F534 " + checkThis.service + " (PORT: " + checkThis.port + ")<br>";
-        newText.id = "control" + checkIndex;
+        newText.id = "control" + (factor + checkIndex);
+        
         ourElement.appendChild(newText);
       }
+      factor += contentState.services.length;
     }
+
+    factor = 0;
 
     for(var i = 0; i < totalComponents.length; i++)
     {
@@ -62,12 +54,14 @@ var OnLoad = function(contentState)
         const checkThis = contentState.services[j];
         const checkIndex = j;
         const compIndex = i;
+        const myFactor = factor;
         const newSocket = netlib.connect({host : totalComponents[compIndex], port : checkThis.port});
         newSocket.on("connect", () => {
-            var controlElement = document.getElementById("control" + checkIndex);
+            var controlElement = document.getElementById("control" + (myFactor + checkIndex));
             controlElement.innerHTML = "&#128994 " + checkThis.service + "<br>";
         })
       }
+      factor += contentState.services.length;
     }
 }
 

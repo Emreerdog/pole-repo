@@ -21,8 +21,6 @@ var PreLoad = function(contentState)
         return 1;
     }
 
-    console.log(urlField.value);
-
     contentState.pageContentState["AdvanceChecked"] = chBox.checked;
     contentState.pageContentState["SelectedUrl"] = urlField.value;
     return 0;
@@ -49,8 +47,6 @@ var OnLoad = function(contentState)
             pathContainer.removeChild(pathContainer.lastChild);
         }
     })
-
-    console.log("loaded path filter");
 }
 
 var exportFunctions = [PreLoad, OnLoad];
