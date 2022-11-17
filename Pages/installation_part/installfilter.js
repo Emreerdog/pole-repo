@@ -8,6 +8,8 @@ var sshLogObject;
 var domainSelector;
 var workingDomain;
 var myContentState;
+var promSSHInstance;
+var promCounter;
 
 function RemainingPercentage()
 {
@@ -258,10 +260,25 @@ var PreLoad = function(contentState)
     return 0;
 }
 
+function PromExecuteRecursive()
+{
+    if(promCounter == sshCommandList.length)
+    {
+        return;
+    }
+    
+    promSSHInstance.execCommand(sshCommandList[promCounter]).then(function(cmdResult){
+        sshLogObject.value += cmdResult.stdout;
+        PromExecuteRecursive();
+        promCounter++;
+    })
+}
+
 var OnLoad = function(contentState)
 {
     myContentState = contentState;
     sshCommandList = new Array();
+    promCounter = 0;
 
     var myContent = document.getElementById("contentContainer");
 
@@ -306,7 +323,7 @@ var OnLoad = function(contentState)
         doc.scrape_configs[4].static_configs[0].targets.push(totalDomainInputs[i] + ":27002");
     }
 
-    var sshInstance = new NodeSSH();
+    promSSHInstance = new NodeSSH();
     const uNAME = myContentState.pageContentState["SSHUsername"];
     const password = myContentState.pageContentState["SSHPassword"];
 
@@ -362,16 +379,11 @@ var OnLoad = function(contentState)
     
     fs.writeFileSync("prometheus.yml", yamlModule.dump(doc, {flowLevel: 5}));
 
-    sshInstance.connect(sshConfig).then(function(){
-        sshInstance.putFile("prometheus.yml", "prometheus.yml");
-        for(var i = 0; i < sshCommandList.length; i++)
-        {
-            const commandStepper = i;
-            sshInstance.execCommand(sshCommandList[commandStepper]).then(function(cmdResult){
-                sshLogObject.value += cmdResult.stdout;
-            });
-        }
+    promSSHInstance.connect(sshConfig).then(function(){
+        promSSHInstance.putFile("prometheus.yml", "prometheus.yml");
     })
+
+    setTimeout(PromExecuteRecursive, 3000);
     // console.log(yamlModule.dump(doc, {schema: yamlModule.JSON_SCHEMA, flowLevel: 5, forceQuotes: true}));
 
     // Setting up prometheus yaml
