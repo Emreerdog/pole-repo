@@ -2,8 +2,11 @@ var PreLoad = function(contentState)
 {
     // If it returns 0
     // We can proceed
-    
-
+    // const fs   = require('fs');
+    // const yamlModule = require("js-yaml");
+    // const doc = yamlModule.load(fs.readFileSync('prometheus.yml', 'utf8'));
+    // doc.scrape_configs[0].static_configs[0].targets.push("bds2");
+    // console.log(yamlModule.dump(doc, {schema: yamlModule.JSON_SCHEMA, flowLevel: 5}));
     return 0;
 }
 
