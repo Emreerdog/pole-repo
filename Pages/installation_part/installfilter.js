@@ -166,6 +166,7 @@ function StartRemoteInstallation()
     var commandDisplayer = document.getElementById("cmdDisplayer");
     domainSelector = document.getElementById("domainSelect");
 
+    domainSelector.style.display = "block";
     domainSelector.onchange = LogSelection;
 
     var commandCount = sshCommandList.length * totalDomainInputs.length;
@@ -264,15 +265,19 @@ function PromExecuteRecursive()
 {
     if(promCounter == sshCommandList.length)
     {
-        return;
+        StartRemoteInstallation();
     }
-    
-    promSSHInstance.execCommand(sshCommandList[promCounter]).then(function(cmdResult){
-        sshLogObject.value += cmdResult.stdout;
-        promCounter++;
-        PromExecuteRecursive();
-       
-    })
+    else
+    {
+        promSSHInstance.execCommand(sshCommandList[promCounter]).then(function(cmdResult){
+            sshLogObject.value += cmdResult.stdout;
+            promCounter++;
+            var progressInstall = document.getElementById("installProgress");
+            progressInstall.style.width = (100 * promCounter) / sshCommandList.length;
+            PromExecuteRecursive();
+            
+        })
+    }
 }
 
 var OnLoad = function(contentState)
@@ -292,6 +297,7 @@ var OnLoad = function(contentState)
 
     sshLogObject = document.getElementById("sshLog");
     var commandDisplayer = document.getElementById("cmdDisplayer");
+    commandDisplayer.innerHTML = "Setting up monitoring tools.";
     domainSelector = document.getElementById("domainSelect");
     domainSelector.style.display = 'none';
 
@@ -415,6 +421,9 @@ var OnLoad = function(contentState)
     })
 
     setTimeout(PromExecuteRecursive, 3000);
+    myContentState.ButtonSetState("back", true);
+    myContentState.ButtonSetState("next", true);
+    myContentState.SetButtonText("Check");
     // console.log(yamlModule.dump(doc, {schema: yamlModule.JSON_SCHEMA, flowLevel: 5, forceQuotes: true}));
 
     // Setting up prometheus yaml
