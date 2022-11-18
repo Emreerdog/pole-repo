@@ -141,6 +141,9 @@ function StartRemoteInstallation()
     sshCommandList.push("/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 4.12.0");
     sshCommandList.push("sudo git clone https://github.com/beartell/bigtop.git /bigtop-home");
     sshCommandList.push("sudo sh -c \"cd /bigtop-home; git checkout release-3.1.1\"");
+    sshCommandList.push("sudo cp -r /bigtop-home/jmx_exporter/ /usr/lib/");
+    sshCommandList.push("sudo cp -r /bigtop-home/jmx_exporter/ /usr/lib/");
+    sshCommandList.push("sudo cp -r /bigtop-home/jmx_exporter/ /usr/lib/");
     sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
     sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
     sshCommandList.push("sudo cp -r /bigtop-home/bigtop-deploy/puppet/hieradata/ /etc/puppet/");
@@ -265,6 +268,7 @@ function PromExecuteRecursive()
 {
     if(promCounter == sshCommandList.length)
     {
+        promSSHInstance.dispose();
         StartRemoteInstallation();
     }
     else
@@ -331,6 +335,7 @@ var OnLoad = function(contentState)
     }
 
     promSSHInstance = new NodeSSH();
+    
     const uNAME = myContentState.pageContentState["SSHUsername"];
     const password = myContentState.pageContentState["SSHPassword"];
 
