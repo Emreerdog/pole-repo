@@ -269,8 +269,9 @@ function PromExecuteRecursive()
     
     promSSHInstance.execCommand(sshCommandList[promCounter]).then(function(cmdResult){
         sshLogObject.value += cmdResult.stdout;
-        PromExecuteRecursive();
         promCounter++;
+        PromExecuteRecursive();
+       
     })
 }
 
@@ -331,36 +332,63 @@ var OnLoad = function(contentState)
     sshCommandList.push("sudo useradd -s /sbin/nologin --system -g prometheus prometheus");
     sshCommandList.push("sudo mkdir /var/lib/prometheus");
     sshCommandList.push("sudo mkdir /etc/prometheus");
-    sshCommandList.push("curl -s https://api.github.com/repos/prometheus/prometheus/releases/latest \\ | grep browser_download_url \\ | grep linux-amd64 \\ | cut -d '\"' -f 4 \\ | wget -qi -");
-    sshCommandList.push("tar xvf prometheus-*.tar.gz");
-    sshCommandList.push("cd prometheus-*/");
-    sshCommandList.push("sudo cp prometheus promtool /usr/local/bin/");
-    sshCommandList.push("sudo cp -r consoles/ console_libraries/ /etc/prometheus/");
-    sshCommandList.push("sudo cp prometheus-*/prometheus.yml /etc/prometheus/");
+    sshCommandList.push("sudo curl -LO https://github.com/prometheus/prometheus/releases/download/v2.40.2/prometheus-2.40.2.linux-amd64.tar.gz");
+    sshCommandList.push("tar xvf prometheus-2.40.2.linux-amd64.tar.gz");
+    sshCommandList.push("sudo cp prometheus-2.40.2.linux-amd64/prometheus /usr/local/bin/");
+    sshCommandList.push("sudo cp prometheus-2.40.2.linux-amd64/promtool /usr/local/bin/");
+    sshCommandList.push("sudo cp -r prometheus-2.40.2.linux-amd64/console_libraries/ /etc/prometheus/");
+    sshCommandList.push("sudo cp -r prometheus-2.40.2.linux-amd64/console_libraries/ /etc/prometheus/");
+    sshCommandList.push("sudo cp -r prometheus-2.40.2.linux-amd64/consoles/ /etc/prometheus/");
+    sshCommandList.push("sudo cp -r prometheus-2.40.2.linux-amd64/consoles/ /etc/prometheus/");
     sshCommandList.push("cat /etc/prometheus/prometheus.yml");
     sshCommandList.push("sudo chown -R prometheus:prometheus /etc/prometheus");
     sshCommandList.push("sudo chown -R prometheus:prometheus /var/lib/prometheus");
     sshCommandList.push("sudo chown prometheus:prometheus /usr/local/bin/{prometheus,promtool}");
-    sshCommandList.push("sudo prometheus --config.file=/etc/prometheus/prometheus.yml");
+    //sshCommandList.push("sudo /usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml");
+    const prometheusCommand = "cat <<EOF | sudo tee /etc/systemd/system/prometheus.service\n"+
+    "[Unit]\n"+
+    "Description=Prometheus\n"+
+    "Documentation=https://prometheus.io/docs/introduction/overview/\n"+
+    "Wants=network-online.target\n"+
+    "After=network-online.target\n"+
+    "\n"+
+    "[Service]\n"+
+    "Type=simple\n"+
+    "User=prometheus\n"+
+    "Group=prometheus\n"+
+    "ExecReload=/bin/kill -HUP $$MAINPID \n"+
+    "ExecStart=/usr/local/bin/prometheus \\\n"+
+    "  --config.file=/etc/prometheus/prometheus.yml \\\n"+
+    "  --storage.tsdb.path=/var/lib/prometheus \\\n"+
+    "  --web.console.templates=/etc/prometheus/consoles \\\n"+
+    "  --web.console.libraries=/etc/prometheus/console_libraries \\\n"+
+    "  --web.listen-address=0.0.0.0:9090 \\\n"+
+    "  --web.external-url=\n"+
+    "\n"+
+    "SyslogIdentifier=prometheus\n"+
+    "Restart=always\n"+
+    "\n"+
+    "[Install]\n"+
+    "WantedBy=multi-user.target\n"+
+    "EOF";
+    sshCommandList.push(prometheusCommand);
     sshCommandList.push("sudo systemctl daemon-reload");
     sshCommandList.push("sudo systemctl enable --now prometheus");
     sshCommandList.push("sudo systemctl status prometheus");
     sshCommandList.push("sudo firewall-cmd --add-port=9090/tcp --permanent sudo");
     sshCommandList.push("sudo firewall-cmd --reload");
-    
-    const longGrafanaCommand = "cat <<EOF | sudo tee /etc/yum.repos.d/grafana.repo" +
-    " "+
-    "[grafana]"+
-    "name=grafana"+
-    "baseurl=https://packages.grafana.com/oss/rpm"+
-    "repo_gpgcheck=1"+
-    "enabled=1"+
-    "gpgcheck=1"+
-    "gpgkey=https://packages.grafana.com/gpg.key"+
-    "sslverify=1"+
-    "sslcacert=/etc/pki/tls/certs/ca-bundle.crt"+
-    "EOF";
-
+    var longGrafanaCommand = "cat <<EOF | sudo tee /etc/yum.repos.d/grafana.repo\n"+
+    " \n"+
+    "[grafana]\n"+
+    "name=grafana\n"+
+    "baseurl=https://packages.grafana.com/oss/rpm\n"+
+    "repo_gpgcheck=1\n"+
+    "enabled=1\n"+
+    "gpgcheck=1\n"+
+    "gpgkey=https://packages.grafana.com/gpg.key\n"+
+    "sslverify=1\n"+
+    "sslcacert=/etc/pki/tls/certs/ca-bundle.crt\n"+
+    "EOF\n";
     sshCommandList.push(longGrafanaCommand);
     sshCommandList.push("sudo dnf install grafana -y");
     sshCommandList.push("sudo rpm -qi grafana");
@@ -378,9 +406,12 @@ var OnLoad = function(contentState)
     }
     
     fs.writeFileSync("prometheus.yml", yamlModule.dump(doc, {flowLevel: 5}));
+    // console.log(prometheusCommand);
+    // console.log(longGrafanaCommand);
 
     promSSHInstance.connect(sshConfig).then(function(){
-        promSSHInstance.putFile("prometheus.yml", "prometheus.yml");
+        console.log("connected.");
+        promSSHInstance.putFile("prometheus.yml", "/etc/prometheus/prometheus.yml");
     })
 
     setTimeout(PromExecuteRecursive, 3000);
