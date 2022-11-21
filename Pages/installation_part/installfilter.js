@@ -148,7 +148,7 @@ function StartRemoteInstallation()
     "WantedBy=multi-user.target\n"+
     "EOF\n";
 
-
+    sshCommandList.push("yum install wget");
     sshCommandList.push("sudo yum -y install git");
     
     sshCommandList.push("wget https://github.com/prometheus/node_exporter/releases/download/v1.4.0/node_exporter-1.4.0.linux-amd64.tar.gz");

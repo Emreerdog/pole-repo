@@ -74,6 +74,7 @@ var OnLoad = function(contentState)
       {
         const checkThis = contentState.services[j];
         const checkIndex = j;
+        const compIndex = i;
         const myFactor = factor;
 
         if(totalComponents[i] != contentState.pageContentState["MasterNode"])
