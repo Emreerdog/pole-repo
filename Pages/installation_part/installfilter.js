@@ -135,7 +135,30 @@ function StartRemoteInstallation()
     "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
     "bigtop::bigtop_repo_uri: \"" + givenRepoUrl + "\"\nEOF\n\"";
 
+    var exporterService = "cat > /etc/systemd/system/node_exporter.service << EOF\n"+
+    "[Unit]\n"+
+    "Description=Node Exporter\n"+
+    "After=network.target\n\n"+
+    "[Service]\n"+
+    "User=node_exporter\n"+
+    "Group=node_exporter\n"+
+    "Type=simple\n"+
+    "ExecStart=/usr/local/bin/node_exporter\n\n"+
+    "[Install]\n"+
+    "WantedBy=multi-user.target\n"+
+    "EOF\n";
+
+
     sshCommandList.push("sudo yum -y install git");
+    
+    sshCommandList.push("wget https://github.com/prometheus/node_exporter/releases/download/v1.4.0/node_exporter-1.4.0.linux-amd64.tar.gz");
+    sshCommandList.push("cp node_exporter-1.4.0.linux-amd64.tar.gz /usr/src/");
+    sshCommandList.push("tar -xf /usr/src/node_exporter-1.4.0.linux-amd64.tar.gz");
+    sshCommandList.push("cp node_exporter-1.4.0.linux-amd64/node_exporter /usr/local/bin/");
+    sshCommandList.push("sudo adduser -M -r -s /sbin/nologin node_exporter");
+    sshCommandList.push(exporterService);
+    sshCommandList.push("sudo systemctl daemon-reload");
+    sshCommandList.push("sudo systemctl enable --now node_exporter");
     sshCommandList.push("sudo rpm -ivh http://yum.puppetlabs.com/puppet5-release-el-8.noarch.rpm");
     sshCommandList.push("sudo yum -y install puppet");
     sshCommandList.push("/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 4.12.0");
@@ -307,13 +330,15 @@ var OnLoad = function(contentState)
 
     const yamlModule = require("js-yaml");
     totalDomainInputs = myContentState.pageContentState["DomainInputs"]; // ARRAY
-    const givenMasterNode = myContentState.pageContentState["MasterNode"]; // STRING
+    // const givenMasterNode = myContentState.pageContentState["MasterNode"]; // STRING
+
+    const promMaster = totalDomainInputs[totalDomainInputs.length - 1];
 
     const fs = require('fs');
     const doc = yamlModule.load(fs.readFileSync('prometheus_template.yml', 'utf8'));
 
-    doc.scrape_configs[0].static_configs[0].targets[0] = givenMasterNode + ":9090";
-    doc.scrape_configs[3].static_configs[0].targets[0] = givenMasterNode + ":27001";
+    doc.scrape_configs[0].static_configs[0].targets[0] = promMaster + ":9090";
+    doc.scrape_configs[3].static_configs[0].targets[0] = myContentState.pageContentState["MasterNode"] + ":27001";
 
     doc.scrape_configs[1].static_configs[0].targets = new Array();
     doc.scrape_configs[2].static_configs[0].targets = new Array();
@@ -409,7 +434,7 @@ var OnLoad = function(contentState)
 
 
     var sshConfig = {
-        host: givenMasterNode,
+        host: promMaster,
         username: uNAME,
         port: 22,
         password,
