@@ -148,9 +148,9 @@ function StartRemoteInstallation()
     "WantedBy=multi-user.target\n"+
     "EOF\n";
 
-    sshCommandList.push("yum install wget");
+    sshCommandList.push("sudo yum -y install wget");
+    sshCommandList.push("sudo yum -y install net-tools");
     sshCommandList.push("sudo yum -y install git");
-    
     sshCommandList.push("wget https://github.com/prometheus/node_exporter/releases/download/v1.4.0/node_exporter-1.4.0.linux-amd64.tar.gz");
     sshCommandList.push("cp node_exporter-1.4.0.linux-amd64.tar.gz /usr/src/");
     sshCommandList.push("tar -xf /usr/src/node_exporter-1.4.0.linux-amd64.tar.gz");
@@ -364,6 +364,7 @@ var OnLoad = function(contentState)
     const uNAME = myContentState.pageContentState["SSHUsername"];
     const password = myContentState.pageContentState["SSHPassword"];
 
+    sshCommandList.push("sudo yum -y install wget");
     sshCommandList.push("sudo groupadd --system prometheus");
     sshCommandList.push("sudo useradd -s /sbin/nologin --system -g prometheus prometheus");
     sshCommandList.push("sudo mkdir /var/lib/prometheus");
