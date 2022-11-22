@@ -3,25 +3,30 @@ var PreLoad = function(contentState)
     // If it returns 0
     // We can proceed
 
-    contentState.pageContentState["SelectedComponents"] = new Array();
-
-    for(var i = 0; i < 19; i++)
+    for(var i = 0; i < contentState.pageContentState["ComponentList"].component_configurations.length; i++)
     {
         var compObject = document.getElementById("comp" + i);
         if(compObject.checked == true)
         {
-            contentState.pageContentState["SelectedComponents"].push(compObject.value);
+            contentState.pageContentState["ComponentList"].component_configurations[i].click_state = true;
+        }
+        else
+        {
+            contentState.pageContentState["ComponentList"].component_configurations[i].click_state = false;
         }
     }
 
-    if(contentState.pageContentState["SelectedComponents"].length == 0)
+    for(var i = 0; i < contentState.pageContentState["ComponentList"].component_configurations.length; i++)
     {
-        var logMsg = document.getElementById("logMessage");
-        logMsg.style.display = "block";
-        return 1;
-        
+        if(contentState.pageContentState["ComponentList"].component_configurations[i].click_state == true)
+        {
+            return 0;
+        }
     }
-    return 0;
+    
+    var logMsg = document.getElementById("logMessage");
+    logMsg.style.display = "block";
+    return 1;
 }
 
 var OnLoad = function(contentState)

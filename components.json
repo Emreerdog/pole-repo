@@ -1,0 +1,89 @@
+{
+    "component_configurations" : [
+		{
+			"comp_name" : "alluxio",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "flink",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "gpdb",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "hbase",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "hcat",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "hive",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "httpfs",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "livy",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "kafka",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "mapred-app",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "oozie",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "solrcloud",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "spark",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "spark-standalone",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "sqoop",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "tez",
+			"service_list" : "",
+            "click_state" : false
+		},
+		{
+			"comp_name" : "ambari",
+			"service_list" : "",
+            "click_state" : false
+		}
+	]
+}

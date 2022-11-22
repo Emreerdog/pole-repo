@@ -100,7 +100,7 @@ function ShellExecutor()
 
 function StartRemoteInstallation()
 {
-    const totalComponents = myContentState.pageContentState["SelectedComponents"]; // ARRAY
+    const totalComponents = contentState.pageContentState["ComponentList"]; // ARRAY
     const totalPathInputs = myContentState.pageContentState["PathInput"]; // ARRAY
 
     const givenRepoUrl = myContentState.pageContentState["SelectedUrl"]; // STRING
@@ -114,9 +114,13 @@ function StartRemoteInstallation()
     workingDomain = undefined
 
     var componentsString = "";
-    for(var i = 0; i < totalComponents.length; i++)
+    for(var i = 0; i < totalComponents.component_configurations.length; i++)
     {
-        componentsString += "- " + totalComponents[i] + "\n";
+        if(contentState.pageContentState["ComponentList"].component_configurations[i].click_state == true)
+        {
+            componentsString += "- " + totalComponents.component_configurations[i].comp_name + "\n";
+        }
+        
     }
     
     var storageDirectories = "";
