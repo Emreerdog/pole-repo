@@ -135,7 +135,7 @@ function StartRemoteInstallation()
     "bigtop::hadoop_head_node: \"" + givenMasterNode + "\"\n"+
     "hadoop::hadoop_storage_dirs:\n"+
     storageDirectories +
-    "hadoop_cluster_node::cluster_components:\n- hdfs-non-ha\n- zookeeper\n"+ componentsString +
+    "hadoop_cluster_node::cluster_components:\n- hdfs-non-ha\n- zookeeper\n- yarn\n"+ componentsString +
     "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
     "bigtop::bigtop_repo_uri: \"" + givenRepoUrl + "\"\nEOF\n\"";
 

@@ -60,7 +60,15 @@ var PreLoad = function(contentState)
         contentState.pageContentState["LifeCheckServices"].push(lifeCheckObject);
     }
 
-    
+    contentState.pageContentState["ComponentList"]
+    for(var i = 0; i < contentState.pageContentState["LifeCheckServices"].length; i++)
+    {
+        for(var j = 0; j < contentState.pageContentState["ComponentList"].default_services.length; j++)
+        {
+            let newObj = {service: contentState.pageContentState["ComponentList"].default_services[j].service, port: contentState.pageContentState["ComponentList"].default_services[j].port};
+            contentState.pageContentState["LifeCheckServices"][i].openServices.push(newObj);       
+        }
+    }
 
     console.log(contentState.pageContentState["LifeCheckServices"]);
 
