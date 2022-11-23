@@ -1,3 +1,5 @@
+const { count } = require("console");
+
 var PreLoad = function(contentState)
 {
     var containerDisplay = document.getElementById("contentContainer");
@@ -24,105 +26,39 @@ var OnLoad = function(contentState)
     const netlib = require("net");
     // contentState.ButtonSetState("back", true);
     contentState.SetButtonText("Finish");
-    const totalComponents = contentState.pageContentState["DomainInputs"];
-    for(var i = 0; i < totalComponents.length; i++)
+    const totalComponents = contentState.pageContentState["LifeCheckServices"];
+    const lifeServices = contentState.pageContentState["LifeCheckServices"];
+    let countServices = 0;
+    for(var i = 0; i < lifeServices.length; i++)
     {
-      var ourElement = document.getElementById("controlBlock");
-      var stepper = 0;
-      var hostSelect = document.createElement("small");
-      hostSelect.innerHTML = "Host (" + totalComponents[i] + ")<br>";
-      ourElement.appendChild(hostSelect);
-      for(var j = 0; j < contentState.services.length; j++)
-      {
-        const checkThis = contentState.services[j];
-        const checkIndex = j;
-
-        if(totalComponents[i] != contentState.pageContentState["MasterNode"])
+        var ourElement = document.getElementById("controlBlock");
+        var hostSelect = document.createElement("small");
+        hostSelect.innerHTML = "Host (" + lifeServices[i].hostMachine + ")<br>";
+        ourElement.appendChild(hostSelect);
+        for(var j = 0; j < lifeServices[i].openServices.length; j++)
         {
-          if(checkThis.level == 1)
-          {
-            // pass
-          }
-          else
-          {
             let newText = document.createElement("small");
-            newText.innerHTML = "&#x1F534 " + checkThis.service + " (PORT: " + checkThis.port + ")<br>";
-            newText.id = "control" + (factor + checkIndex);
-            stepper += 1;
-            ourElement.appendChild(newText);
-          }
+            newText.innerHTML = "&#x1F534 " + lifeServices[i].openServices[j].service + " (PORT: " + lifeServices[i].openServices[j].port + ")<br>";
+            newText.id = "control" + (countServices + j);
         }
-
-        else
-        {
-          let newText = document.createElement("small");
-          newText.innerHTML = "&#x1F534 " + checkThis.service + " (PORT: " + checkThis.port + ")<br>";
-          newText.id = "control" + (factor + checkIndex);
-          stepper += 1;
-          ourElement.appendChild(newText);
-        }
-      }
-      factor += stepper;
+        countServices += lifeServices[i].openServices.length;
     }
 
-    factor = 0;
+    countServices = 0;
 
-    for(var i = 0; i < totalComponents.length; i++)
+    for(var i = 0; i < lifeServices.length; i++)
     {
-      var stepper = 0;
-      for(var j = 0; j < contentState.services.length; j++)
-      {
-        const checkThis = contentState.services[j];
-        const checkIndex = j;
         const compIndex = i;
-        const myFactor = factor;
-
-        if(totalComponents[i] != contentState.pageContentState["MasterNode"])
-        {
-          if(checkThis.level == 1)
-          {
-            // pass
-          }
-          else
-          {
-            const newSocket = netlib.connect({host : totalComponents[compIndex], port : checkThis.port});
+        for(var j = 0; j < lifeServices[i].openServices.length; j++)
+        { 
+            const serviceIndex = countServices + j;
+            const newSocket = netlib.connect({host: lifeServices[compIndex].hostMachine, port: lifeServices[compIndex].openServices[serviceIndex].port});
             newSocket.on("connect", () => {
-              var controlElement = document.getElementById("control" + (myFactor + checkIndex));
-              controlElement.innerHTML = "&#128994" + checkThis.service + " (PORT: " + checkThis.port + ")<br>";
-            })
-            stepper += 1;
-          }
+              document.getElementById("control" + serviceIndex).innerHTML = "&#128994 " + lifeServices[compIndex].openServices[serviceIndex].service + " PORT(" + lifeServices[compIndex].openServices[serviceIndex].port + ")<br>";
+            })  
         }
-
-        else
-        {
-          const newSocket = netlib.connect({host : totalComponents[compIndex], port : checkThis.port});
-          newSocket.on("connect", () => {
-            var controlElement = document.getElementById("control" + (myFactor + checkIndex));
-            controlElement.innerHTML = "&#128994" + checkThis.service + " (PORT: " + checkThis.port + ")<br>";
-          })
-          stepper += 1;
-        }
-      }
-      factor += stepper;
+        countServices += lifeServices[i].openServices.length;
     }
-
-    // for(var i = 0; i < totalComponents.length; i++)
-    // {
-    //   for(var j = 0; j < contentState.services.length; j++)
-    //   {
-    //     const checkThis = contentState.services[j];
-    //     const checkIndex = j;
-    //     const compIndex = i;
-    //     const myFactor = factor;
-    //     const newSocket = netlib.connect({host : totalComponents[compIndex], port : checkThis.port});
-    //     newSocket.on("connect", () => {
-    //         var controlElement = document.getElementById("control" + (myFactor + checkIndex));
-    //         controlElement.innerHTML = "&#128994 " + checkThis.service + " (PORT: "+ checkThis.port +")<br>";
-    //     })
-    //   }
-    //   factor += contentState.services.length;
-    // }
 }
 
 var exportFunctions = [PreLoad, OnLoad];

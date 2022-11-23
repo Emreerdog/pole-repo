@@ -12,7 +12,6 @@ var PreLoad = function(contentState)
 
 var OnLoad = function(contentState)
 {
-
     var addDomainButton = document.getElementById("domainAdd");
     var removeDomainButton = document.getElementById("rmvButton");
     var domainContainer = document.getElementById("textContainer");
@@ -54,8 +53,6 @@ var OnLoad = function(contentState)
 
     var domainRows = domainContainer.children;
     domainRows[0].value = contentState.pageContentState["DomainInputs"][0];
-
-
 
     for(var i = 1; i < inputCount; i++)
     {

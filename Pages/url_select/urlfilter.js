@@ -16,6 +16,54 @@ var PreLoad = function(contentState)
         }
     }
 
+    contentState.pageContentState["LifeCheckServices"] = new Array();
+
+    for(var i = 0; i < contentState.pageContentState["DomainInputs"].length; i++)
+    {
+        let topArray = new Array();
+        let lifeCheckObject = {hostMachine: contentState.pageContentState["DomainInputs"][i], openServices : topArray};
+        for(var j = 0; j < contentState.pageContentState["ComponentList"].component_configurations.length; j++)
+        {
+            if(contentState.pageContentState["ComponentList"].component_configurations[j].click_state == true)
+            {
+                if(contentState.pageContentState["ComponentList"].component_configurations[j].service_list == "")
+                {
+
+                }
+                else
+                {
+                    for(var k = 0; k < contentState.pageContentState["ComponentList"].component_configurations[j].service_list.length; k++)
+                    {
+                        let myObject = {service: contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].service, port: contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].port};
+                        contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k]
+                        if(contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].level == 1)
+                        {
+                            if(lifeCheckObject.hostMachine != contentState.pageContentState["MasterNode"])
+                            {
+
+                            }
+                            else
+                            {
+                                lifeCheckObject.openServices.push(myObject);
+                            }
+                        }
+                        else
+                        {
+                            lifeCheckObject.openServices.push(myObject);
+                        }
+                    }
+                    // lifeCheckObject.openServices.push(contentState.pageContentState["ComponentList"].component_configurations[j].service_list);      
+                }
+            }
+        }
+        //lifeCheckObject.openServices.push(contentState.pageContentState["ComponentList"].default_services);
+        contentState.pageContentState["LifeCheckServices"].push(lifeCheckObject);
+    }
+
+    
+
+    console.log(contentState.pageContentState["LifeCheckServices"]);
+
     for(var i = 0; i < contentState.pageContentState["ComponentList"].component_configurations.length; i++)
     {
         if(contentState.pageContentState["ComponentList"].component_configurations[i].click_state == true)

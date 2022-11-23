@@ -11,11 +11,6 @@
 			"level" : 1
 		},
 		{
-			"service" : "ZooKeeper",
-			"port" : 2181,
-			"level" : 0
-		},
-		{
 			"service" : "Region Server",
 			"port" : 16020,
 			"level" : 0
@@ -26,6 +21,46 @@
 			"level" : 1
 		},
 		{
+			"service" : "ZooKeeper",
+			"port" : 2181,
+			"level" : 0
+		},
+		{
+			"service" : "Livy Server",
+			"port" : 8998,
+			"level" : 1
+		},
+		{
+			"service" : "Flink Job Manager",
+			"port" : 8081,
+			"level" : 1
+		},
+		{
+			"service" : "Alluxio Worker",
+			"port" : 30000,
+			"level" : 0
+		},
+		{
+			"service" : "Alluxio Master",
+			"port" : 19999,
+			"level" : 1
+		},
+		{
+			"service" : "Oozie Server",
+			"port" : 11000,
+			"level" : 1
+		},
+		{
+			"service" : "Httpfs Web Server",
+			"port" : 14000,
+			"level" : 1
+		},
+		{
+			"service" : "Solr Server",
+			"port" : 8983,
+			"level" : 0
+		},
+		{
 			"service" : "Resource Manager",
 			"port" : 8088,
 			"level" : 1
@@ -33,6 +68,31 @@
 		{
 			"service" : "Node Manager",
 			"port" : 8042,
+			"level" : 0
+		},
+		{
+			"service" : "Kafka Server",
+			"port" : 9092,
+			"level" : 0
+		},
+		{
+			"service" : "Ambari Agent",
+			"port" : 8670,
+			"level" : 0
+		},
+		{
+			"service" : "Ambari Server",
+			"port" : 8080,
+			"level" : 1
+		},
+		{
+			"service" : "Hive Server",
+			"port" : 10002,
+			"level" : 1
+		},
+		{
+			"service" : "Gpdb",
+			"port" : 5432,
 			"level" : 0
 		}
 	],
