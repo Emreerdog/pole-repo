@@ -46,23 +46,6 @@
 			"display_state" : true
 		},
 		{
-			"comp_name" : "hbase",
-			"service_list" : [
-				{
-					"service": "HMaster",
-					"port" : 16010,
-					"level" : 1
-				},
-				{
-					"service" : "Region Server",
-					"port" : 16020,
-					"level" : 0
-				}
-			],
-            "click_state" : false,
-			"display_state" : true
-		},
-		{
 			"comp_name" : "hive",
 			"service_list" : 
 			[
@@ -141,12 +124,6 @@
 			"display_state" : true
 		},
 		{
-			"comp_name" : "tez",
-			"service_list" : "",
-            "click_state" : false,
-			"display_state" : true
-		},
-		{
 			"comp_name" : "ambari",
 			"service_list" : 
 			[
@@ -186,6 +163,16 @@
 				{
 					"service" : "Node Manager",
 					"port" : 8042,
+					"level" : 0
+				},
+				{
+					"service": "HMaster",
+					"port" : 16010,
+					"level" : 1
+				},
+				{
+					"service" : "Region Server",
+					"port" : 16030,
 					"level" : 0
 				}
 			],

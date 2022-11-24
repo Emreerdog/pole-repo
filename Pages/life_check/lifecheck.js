@@ -25,7 +25,6 @@ var OnLoad = function(contentState)
     var factor = 0;
     const netlib = require("net");
     
-    
     const lifeServices = contentState.pageContentState["LifeCheckServices"];
     let countServices = 0;
     for(var i = 0; i < lifeServices.length; i++)

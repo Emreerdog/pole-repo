@@ -60,6 +60,9 @@ var PreLoad = function(contentState)
         contentState.pageContentState["LifeCheckServices"].push(lifeCheckObject);
     }
 
+    const lastHostIndex = contentState.pageContentState["LifeCheckServices"].length - 1;
+    contentState.pageContentState["LifeCheckServices"][lastHostIndex].openServices.push({service: "Prometheus", port: 9090});
+    contentState.pageContentState["LifeCheckServices"][lastHostIndex].openServices.push({service: "Grafana", port: 3000});
     console.log(contentState.pageContentState["LifeCheckServices"]);
 
     for(var i = 0; i < contentState.pageContentState["ComponentList"].component_configurations.length; i++)

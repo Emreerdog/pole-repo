@@ -21,9 +21,9 @@ function RemainingPercentage()
 function UpdatePercentage() {
     const totalLength = (sshCommandList.length * totalDomainInputs.length);
     document.getElementById("installProgress").style.width = RemainingPercentage() + '%';
-    document.getElementById("cmdDisplayer").innerHTML = globalCommandCounter + '/' + totalLength;
+    document.getElementById("cmdDisplayer").innerHTML = '%' + RemainingPercentage();
 } 
- 
+
 function LogSelection()
 {
     var outDomain = domainSelector.value;
@@ -106,6 +106,8 @@ function StartRemoteInstallation()
     const givenRepoUrl = myContentState.pageContentState["SelectedUrl"]; // STRING
     const givenMasterNode = myContentState.pageContentState["MasterNode"]; // STRING
 
+    
+
     sshCommandList = new Array();
     globalCommandCounter = 0;
     connectionInfoObjects = new Array();
@@ -139,7 +141,7 @@ function StartRemoteInstallation()
     "bigtop::hadoop_head_node: \"" + givenMasterNode + "\"\n"+
     "hadoop::hadoop_storage_dirs:\n"+
     storageDirectories +
-    "hadoop_cluster_node::cluster_components:\n- hdfs-non-ha\n- zookeeper\n- yarn\n"+ componentsString +
+    "hadoop_cluster_node::cluster_components:\n- hdfs-non-ha\n- zookeeper\n- yarn\n"+ componentsString + "- hbase\n" +
     "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
     "bigtop::bigtop_repo_uri: \"" + givenRepoUrl + "\"\nEOF\n\"";
 
@@ -245,7 +247,7 @@ function StartRemoteInstallation()
     }
     
     setTimeout(ShellExecutor, 3000);
-    commandDisplayer.innerHTML = globalCommandCounter + "/" + commandCount;
+    commandDisplayer.innerHTML = "%" + 0;
 }
 
 var PreLoad = function(contentState)
@@ -307,8 +309,6 @@ function PromExecuteRecursive()
         promSSHInstance.execCommand(sshCommandList[promCounter]).then(function(cmdResult){
             sshLogObject.value += cmdResult.stdout;
             promCounter++;
-            var progressInstall = document.getElementById("installProgress");
-            progressInstall.style.width = (100 * promCounter) / sshCommandList.length;
             PromExecuteRecursive();
             
         })
@@ -326,7 +326,6 @@ var OnLoad = function(contentState)
     myContent.style.marginLeft = "10px";
     myContent.innerHTML = "<h5>Installation Started</h5><p>Installation Log:</p>"+
     "<p id='cmdDisplayer'></p>"+
-    "<div class='progress-bar bg-success' role='progressbar' aria-valuenow='25' aria-valuemin='25' aria-valuemax='100' id='installProgress'></div>"+
     "<select name='domainSelect' id='domainSelect'></select>"+
     "<textarea id='sshLog' cols='30' rows='10' disabled></textarea>";   
 
