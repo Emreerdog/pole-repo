@@ -118,7 +118,11 @@ function StartRemoteInstallation()
     {
         if(myContentState.pageContentState["ComponentList"].component_configurations[i].click_state == true)
         {
-            componentsString += "- " + totalComponents.component_configurations[i].comp_name + "\n";
+            if(totalComponents.component_configurations[i].comp_name != "default_services")
+            {
+                componentsString += "- " + totalComponents.component_configurations[i].comp_name + "\n";
+            }
+            
         }
         
     }
