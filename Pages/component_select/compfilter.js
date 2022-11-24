@@ -57,24 +57,30 @@ var OnLoad = function(contentState)
     console.log(rightHalf);
 
     let componentCounter = 0;
-    for(var i = 0; i < componentObjects.component_configurations.length - rightHalf; i++)
+    for(var i = 0; i < componentObjects.component_configurations.length / 2; i++)
     {
         let tempElement = document.createElement("input");
         tempElement.type = "checkbox";
         tempElement.id = "comp" + componentCounter;
         tempElement.name = "comp" + componentCounter;
         tempElement.value = componentObjects.component_configurations[componentCounter].comp_name;
+        if(componentObjects.component_configurations[componentCounter].display_state == false)
+        {
+            tempElement.style.display= "none";
+        }
         leftContainer.appendChild(tempElement);
 
         tempElement = document.createElement("label");
         tempElement.for = "comp" + componentCounter;
         tempElement.innerHTML = componentObjects.component_configurations[componentCounter].comp_name;
-        leftContainer.appendChild(tempElement);
-
+        if(componentObjects.component_configurations[componentCounter].display_state == false)
+        {
+            tempElement.style.display= "none";
+        }
+        
+        leftContainer.appendChild(tempElement);      
         tempElement = document.createElement("br");
         leftContainer.appendChild(tempElement);
-
-
         componentCounter++;
     }
 
@@ -85,13 +91,21 @@ var OnLoad = function(contentState)
         tempElement.id = "comp" + componentCounter;
         tempElement.name = "comp" + componentCounter;
         tempElement.value = componentObjects.component_configurations[componentCounter].comp_name;
+        if(componentObjects.component_configurations[componentCounter].display_state == false)
+        {
+            tempElement.style.display= "none";
+        }
         rightContainer.appendChild(tempElement);
 
         tempElement = document.createElement("label");
         tempElement.for = "comp" + componentCounter;
         tempElement.innerHTML = componentObjects.component_configurations[componentCounter].comp_name;
-        rightContainer.appendChild(tempElement);
-
+        if(componentObjects.component_configurations[componentCounter].display_state == false)
+        {
+            tempElement.style.display= "none";
+        }
+        
+        rightContainer.appendChild(tempElement);      
         tempElement = document.createElement("br");
         rightContainer.appendChild(tempElement);
         componentCounter++;

@@ -26,7 +26,7 @@ var OnLoad = function(contentState)
     const netlib = require("net");
     // contentState.ButtonSetState("back", true);
     contentState.SetButtonText("Finish");
-    const totalComponents = contentState.pageContentState["LifeCheckServices"];
+    
     const lifeServices = contentState.pageContentState["LifeCheckServices"];
     let countServices = 0;
     for(var i = 0; i < lifeServices.length; i++)

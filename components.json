@@ -16,7 +16,8 @@
 					"level" : 1
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "flink",
@@ -28,7 +29,8 @@
 					"level" : 1
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "gpdb",
@@ -40,7 +42,8 @@
 					"level" : 0
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "hbase",
@@ -56,7 +59,8 @@
 					"level" : 0
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "hive",
@@ -68,7 +72,8 @@
 					"level" : 1
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "httpfs",
@@ -80,7 +85,8 @@
 					"level" : 1
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "livy",
@@ -92,7 +98,8 @@
 					"level" : 1
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "kafka",
@@ -104,7 +111,8 @@
 					"level" : 0
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "oozie",
@@ -116,7 +124,8 @@
 					"level" : 1
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "solrcloud",
@@ -128,12 +137,14 @@
 					"level" : 0
 				}
 			],
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "tez",
 			"service_list" : "",
-            "click_state" : false
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
 			"comp_name" : "ambari",
@@ -150,30 +161,36 @@
 					"level" : 1
 				}
 			],
-            "click_state" : false
-		}
-	],
-	"default_services" : 
-	[
-		{
-			"service" : "Data Node Manager",
-			"port" : 9864,
-			"level" : 0
+            "click_state" : false,
+			"display_state" : true
 		},
 		{
-			"service" : "Name Node Manager",
-			"port" : 50070,
-			"level" : 1
-		},
-		{
-			"service" : "Resource Manager",
-			"port" : 8088,
-			"level" : 1
-		},
-		{
-			"service" : "Node Manager",
-			"port" : 8042,
-			"level" : 0
+			"comp_name" : "default_services",
+			"service_list" :
+			[
+				{
+					"service" : "Data Node Manager",
+					"port" : 9864,
+					"level" : 0
+				},
+				{
+					"service" : "Name Node Manager",
+					"port" : 50070,
+					"level" : 1
+				},
+				{
+					"service" : "Resource Manager",
+					"port" : 8088,
+					"level" : 1
+				},
+				{
+					"service" : "Node Manager",
+					"port" : 8042,
+					"level" : 0
+				}
+			],
+			"click_state" : true,
+			"display_state" : false
 		}
 	]
 }

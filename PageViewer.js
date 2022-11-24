@@ -53,14 +53,6 @@ class PolePageViewer{
             
         }
 
-        
-
-        for(var i = 0; i < this.#contentData.serviceInfos.length; i++)
-        {
-            var serviceInformation = {service : this.#contentData.serviceInfos[i].service, port :  this.#contentData.serviceInfos[i].port, level :  this.#contentData.serviceInfos[i].level};
-            this.services.push(serviceInformation);
-        }
-
         if(this.#pageList.length == 1 || this.#pageList.length == 0)
         {
             this.#nextButton.disabled = true;
