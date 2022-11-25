@@ -349,8 +349,8 @@ var OnLoad = function(contentState)
     {
         doc.scrape_configs[4].static_configs[0].targets.push(totalDomainInputs[i] + ":27002");
     }
-
-    promSSHInstance = new NodeSSH();
+    const lastMachine = contentState.pageContentState["RemoteControlObject"].remoteMachines.length;
+    promSSHInstance = contentState.pageContentState["RemoteControlObject"].remoteMachines[lastMachine].selfSsh;
     
     const uNAME = myContentState.pageContentState["SSHUsername"];
     const password = myContentState.pageContentState["SSHPassword"];
@@ -425,21 +425,22 @@ var OnLoad = function(contentState)
     sshCommandList.push("sudo firewall-cmd --reload");    
 
 
-    var sshConfig = {
-        host: promMaster,
-        username: uNAME,
-        port: 22,
-        password,
-        tryKeyboard: false
-    }
+    // var sshConfig = {
+    //     host: promMaster,
+    //     username: uNAME,
+    //     port: 22,
+    //     password,
+    //     tryKeyboard: false
+    // }
     
     fs.writeFileSync("prometheus.yml", yamlModule.dump(doc, {flowLevel: 5}));
-    // console.log(prometheusCommand);
-    // console.log(longGrafanaCommand);
-    promSSHInstance.connect(sshConfig).then(function(){
-        console.log("connected.");
-        promSSHInstance.putFile("prometheus.yml", "/etc/prometheus/prometheus.yml");
-    })
+    
+    promSSHInstance.putFile("prometheus.yml", "/etc/prometheus/prometheus.yml");
+
+    // promSSHInstance.connect(sshConfig).then(function(){
+    //     console.log("connected.");
+    //     promSSHInstance.putFile("prometheus.yml", "/etc/prometheus/prometheus.yml");
+    // })
 
     setTimeout(PromExecuteRecursive, 3000);
     myContentState.ButtonSetState("back", true);
