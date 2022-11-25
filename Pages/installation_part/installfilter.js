@@ -350,7 +350,7 @@ var OnLoad = function(contentState)
         doc.scrape_configs[4].static_configs[0].targets.push(totalDomainInputs[i] + ":27002");
     }
     const lastMachine = contentState.pageContentState["RemoteControlObject"].remoteMachines.length;
-    promSSHInstance = contentState.pageContentState["RemoteControlObject"].remoteMachines[lastMachine].selfSsh;
+    promSSHInstance = contentState.pageContentState["RemoteControlObject"].remoteMachines[lastMachine - 1].selfSsh;
     
     const uNAME = myContentState.pageContentState["SSHUsername"];
     const password = myContentState.pageContentState["SSHPassword"];
