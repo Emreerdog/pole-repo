@@ -201,7 +201,7 @@ function StartRemoteInstallation()
     domainSelector.style.display = "block";
     domainSelector.onchange = LogSelection;
 
-    connectionInfoObjects = contentState.pageContentState["RemoteControlObject"].remoteMachines;
+    connectionInfoObjects = myContentState.pageContentState["RemoteControlObject"].remoteMachines;
 
     connectionInfoObjects.forEach((remoteObject) => {
         var newOption = document.createElement("option");
