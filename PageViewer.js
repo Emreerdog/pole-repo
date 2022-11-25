@@ -7,6 +7,7 @@ class PolePageViewer{
     #pageList = new Array();
 
     pageContentState = new Array();
+    services = new Array();
 
     constructor(page_config, fieldId, nextId, prevId)
     {
@@ -42,7 +43,9 @@ class PolePageViewer{
                     // loadScript = pageDescriptor.filterScript.OnLoad(undefined);
                     // preLoadScript = pageDescriptor.filterScript.PreLoad(undefined);
                 }
+                
                 pageDescriptor.contentString = fileSystem.readFileSync(this.#contentData.pagelist[i].content);
+                //pageDescriptor.contentString = this.#contentData.pagelist[i].content;
                 this.#pageList.push(pageDescriptor);
             } catch(err){
                 console.log(err);
@@ -57,6 +60,7 @@ class PolePageViewer{
 
         this.#documentField.innerHTML = this.#pageList[0].contentString;
         this.#pageIndex = 1;
+
     }
 
     NextPage()
@@ -139,6 +143,29 @@ class PolePageViewer{
     {
         this.#nextButton.innerHTML = value;
     }
+
+    ButtonSetState(which, state)
+    {
+        if(which == "back")
+        {
+            this.#previousButton.disabled = state;
+            return 0;
+        }
+
+        else if(which == "next")
+        {
+            this.#nextButton.disabled = state;
+            return 0;
+        }
+
+        return 1;
+    }
+
+    Reload()
+    {
+        this.#documentField = document.getElementById("contentPart");
+    }
+
     DisableFooterPart()
     {
         var footerButtons = document.getElementById("footerButtons");

@@ -1,29 +1,25 @@
-function checkForDuplicates(array) {
-    let valuesAlreadySeen = []
-  
-    for (let i = 0; i < array.length; i++) {
-      let value = array[i]
-      if (valuesAlreadySeen.indexOf(value) !== -1) {
-        return true
-      }
-      valuesAlreadySeen.push(value)
-    }
-    return false
-  }
-  
+const { NodeSSH } = require("node-ssh");
 
 var PreLoad = function(contentState)
 {
-    var returnValue = 0;
     // If it returns 0
     // We can proceed
     
-    var logViewer = document.getElementById("logMessage");
-    var domainContainer = document.getElementById("textContainer");
-    var inputDomains = domainContainer.children;
-    var inputDomainscheck = domainContainer.children;
+    let logViewer = document.getElementById("logMessage");
+    let domainContainer = document.getElementById("textContainer");
+    let inputDomains = domainContainer.children;
+
+    if(contentState.pageContentState["RemoteControlObject"] != undefined)
+    {
+        clearInterval(contentState.pageContentState["RemoteControlObject"].intervalInstance);
+        contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((remoteObjInstance) => {
+            // DISCONNECT IF CONNECTED
+            remoteObjInstance.selfSsh.dispose();
+        })
+    }
 
     contentState.pageContentState["DomainInputs"] = new Array();
+    contentState.pageContentState["RemoteControlObject"] = {remoteMachines: new Array(), connectedCount: 0, intervalInstance: -1};
 
     for(var i = 0; i < inputDomains.length; i++)
     {
@@ -39,20 +35,60 @@ var PreLoad = function(contentState)
             logViewer.style.display = "block";
             return 1;
         }
+        const tempNode = new NodeSSH();
+        
+        let remoteObject = {selfSsh : tempNode, hostInfo: inputDomains[i].value, outputLog : "", cmdIndex : 0};
+        contentState.pageContentState["RemoteControlObject"].remoteMachines.push(remoteObject);
         contentState.pageContentState["DomainInputs"].push(inputDomains[i].value);
     }
-    console.log("what");
+
+    contentState.pageContentState["RemoteControlObject"].intervalInstance = setInterval(() => {
+        if(contentState.pageContentState["RemoteControlObject"].connectedCount == contentState.pageContentState["RemoteControlObject"].remoteMachines.length)
+        {
+            clearInterval(contentState.pageContentState["RemoteControlObject"].intervalInstance);
+            return 1;
+        }
+        contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((remoteObjInstance) => {
+            const remoteUname = 'root';
+            const remotePass = '1234';
+            const myConfig = {
+                host : remoteObjInstance.hostInfo,
+                username: remoteUname,
+                port: 22,
+                password: remotePass,
+                tryKeyboard : false
+            };
+            
+            remoteObjInstance.selfSsh.connect(myConfig).then(() => {
+                contentState.pageContentState["RemoteControlObject"].connectedCount++;
+            }, (err) => {
+                console.log(err);
+                contentState.pageContentState["RemoteControlObject"].connectedCount = 0;
+                contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((newRemoteObj) => {
+                    newRemoteObj.selfSsh.dispose();
+                })
+            })
+        })
+    }, 2000);
+
     return 0;
 }
 
 var OnLoad = function(contentState)
 {
     var masterNodeSelector = document.getElementById("masterSelect");
+    
     for(var i = 0; i < contentState.pageContentState["DomainInputs"].length; i++)
     {
         var optionElement = document.createElement("option");
+        optionElement.value = contentState.pageContentState["DomainInputs"][i];
         optionElement.innerHTML = contentState.pageContentState["DomainInputs"][i];
         masterNodeSelector.appendChild(optionElement);
+    }
+
+    if(contentState.pageContentState["MasterNode"] != undefined)
+    {
+        masterNodeSelector.value = contentState.pageContentState["MasterNode"];
     }
 }
 

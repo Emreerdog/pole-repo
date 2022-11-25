@@ -2,7 +2,11 @@ var PreLoad = function(contentState)
 {
     // If it returns 0
     // We can proceed
-    
+    // const fs   = require('fs');
+    // const yamlModule = require("js-yaml");
+    // const doc = yamlModule.load(fs.readFileSync('prometheus.yml', 'utf8'));
+    // doc.scrape_configs[0].static_configs[0].targets.push("bds2");
+    // console.log(yamlModule.dump(doc, {schema: yamlModule.JSON_SCHEMA, flowLevel: 5}));
     return 0;
 }
 
@@ -50,12 +54,9 @@ var OnLoad = function(contentState)
     var domainRows = domainContainer.children;
     domainRows[0].value = contentState.pageContentState["DomainInputs"][0];
 
-    console.log(contentState.pageContentState["DomainInputs"]);
-
     for(var i = 1; i < inputCount; i++)
     {
         var domainInputString = contentState.pageContentState["DomainInputs"][i];
-        console.log(domainInputString);
         var newDomain = document.createElement("input");
         newDomain.type = "text";
         newDomain.className = "w-100 mb-1";

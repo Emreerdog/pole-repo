@@ -3,7 +3,17 @@ var PreLoad = function(contentState)
     // If it returns 0
     // We can proceed
 
-    var urlField = document.getElementById("repoUrl");
+    var urlField;
+    var chBox = document.getElementById("advanceCheck");
+    if(chBox.checked == true)
+    {
+        urlField = document.getElementById("repoUrlText");
+    }
+    else
+    {
+        urlField = document.getElementById("repoUrl");
+    }
+    
     if(urlField.value == "")
     {
         var lgMsg = document.getElementById("logMessage");
@@ -11,6 +21,7 @@ var PreLoad = function(contentState)
         return 1;
     }
 
+    contentState.pageContentState["AdvanceChecked"] = chBox.checked;
     contentState.pageContentState["SelectedUrl"] = urlField.value;
     return 0;
 }
@@ -21,7 +32,6 @@ var OnLoad = function(contentState)
     var removePathButton = document.getElementById("pathRemoveButton");
     var pathContainer = document.getElementById("textContainer");
     var ourPaths = pathContainer.children;
-    contentState.SetButtonText("Install");
     addPathButton.addEventListener('click', () => {
         var newPath = document.createElement("input");
         newPath.type = "text";
@@ -37,8 +47,6 @@ var OnLoad = function(contentState)
             pathContainer.removeChild(pathContainer.lastChild);
         }
     })
-
-    console.log("loaded path filter");
 }
 
 var exportFunctions = [PreLoad, OnLoad];

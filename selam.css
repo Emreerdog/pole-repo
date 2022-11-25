@@ -30,8 +30,10 @@ html {
   }
   
   #contentPart {
+    width: 500px;
+    height: 350px;
     padding: 20px;
-    overflow-y: auto;
+    overflow: auto;
   }
   
   #footerButtons {
@@ -67,7 +69,7 @@ html {
   #logMessage {
     display: none;
   }
-  
+
   #buttonsContainer {
     margin-right: 135px;
     margin-top: 10px;
@@ -191,7 +193,7 @@ html {
   }
 
   #installProgress{
-    width: 40%;
+    width: 0%;
     border-radius: 0px;
     height: 20px;
     margin-bottom: 5px;
@@ -199,4 +201,8 @@ html {
 
   #cmdDisplayer{
     line-height: 1;
+  }
+
+  #repoUrlText{
+    display: none;
   }
