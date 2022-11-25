@@ -1,19 +1,43 @@
+const { NodeSSH } = require("node-ssh");
+
 var PreLoad = function(contentState)
 {
-    var pathContainer = document.getElementById("textContainer");
-    var ourPaths = pathContainer.children;
-    var logText = document.getElementById("logMessage");
+    let logViewer = document.getElementById("logMessage");
+    let domainContainer = document.getElementById("textContainer");
+    let inputDomains = domainContainer.children;
 
-    contentState.pageContentState["PathInput"] = new Array();
-
-    for(var i = 0; i < ourPaths.length; i++)
+    if(contentState.pageContentState["RemoteControlObject"] != undefined)
     {
-        if(ourPaths[i].value == "")
+        clearInterval(contentState.pageContentState["RemoteControlObject"].intervalInstance);
+        contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((remoteObjInstance) => {
+            // DISCONNECT IF CONNECTED
+            remoteObjInstance.selfSsh.dispose();
+        })
+    }
+
+    contentState.pageContentState["DomainInputs"] = new Array();
+    contentState.pageContentState["RemoteControlObject"] = {remoteMachines: new Array(), connectedCount: 0, intervalInstance: -1};
+
+    for(var i = 0; i < inputDomains.length; i++)
+    {
+        if(contentState.pageContentState["DomainInputs"].indexOf(inputDomains[i].value) !== -1)
         {
-            logText.style.display = "block";
+            logViewer.innerHTML = "*Domain fields can not be same";
+            logViewer.style.display = "block";
             return 1;
         }
-        contentState.pageContentState["PathInput"].push(ourPaths[i].value);
+
+        if(inputDomains[i].value == "")
+        {
+            logViewer.innerHTML = "*Domain fields can not be blank";
+            logViewer.style.display = "block";
+            return 1;
+        }
+        const tempNode = new NodeSSH();
+        
+        let remoteObject = {selfSsh : tempNode, hostInfo: inputDomains[i].value, outputLog : "", cmdIndex : 0};
+        contentState.pageContentState["RemoteControlObject"].remoteMachines.push(remoteObject);
+        contentState.pageContentState["DomainInputs"].push(inputDomains[i].value);
     }
 
     return 0;
@@ -42,7 +66,6 @@ var OnLoad = function(contentState)
             contentState.pageContentState["SSHMethod"] = 1;
         }
     }
-    contentState.SetButtonText("Install");
 }
 
 var exportFunctions = [PreLoad, OnLoad];

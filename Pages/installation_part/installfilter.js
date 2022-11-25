@@ -1,5 +1,3 @@
-const { NodeSSH } = require("node-ssh");
-
 var totalDomainInputs;
 var sshCommandList;
 var globalCommandCounter;
@@ -203,19 +201,25 @@ function StartRemoteInstallation()
     domainSelector.style.display = "block";
     domainSelector.onchange = LogSelection;
 
-    var commandCount = sshCommandList.length * totalDomainInputs.length;
+    connectionInfoObjects = contentState.pageContentState["RemoteControlObject"].remoteMachines;
 
-    for(var i = 0; i < totalDomainInputs.length; i++)
-    {
-        var sshInstance = new NodeSSH();
-        var newConnectionInformation = {selfSsh : sshInstance, isFinished : false, hostInfo : totalDomainInputs[i], outputLog: "", cmdIndex: 0, connIndex: 0};
-        connectionInfoObjects.push(newConnectionInformation);
-        newConnectionInformation.connIndex = i;
-
+    connectionInfoObjects.forEach((remoteObject) => {
         var newOption = document.createElement("option");
-        newOption.innerHTML = newConnectionInformation.hostInfo;
+        newOption.innerHTML = remoteObject.hostInfo;
         domainSelector.appendChild(newOption);
-    }
+    });
+
+    // for(var i = 0; i < totalDomainInputs.length; i++)
+    // {
+    //     var sshInstance = new NodeSSH();
+    //     var newConnectionInformation = {selfSsh : sshInstance, isFinished : false, hostInfo : totalDomainInputs[i], outputLog: "", cmdIndex: 0, connIndex: 0};
+    //     connectionInfoObjects.push(newConnectionInformation);
+    //     newConnectionInformation.connIndex = i;
+
+    //     var newOption = document.createElement("option");
+    //     newOption.innerHTML = newConnectionInformation.hostInfo;
+    //     domainSelector.appendChild(newOption);
+    // }
 
     workingDomain = connectionInfoObjects[0];
 
@@ -228,76 +232,50 @@ function StartRemoteInstallation()
     
     myContentState.pageContentState["SSHConnectionInstances"] = connectionInfoObjects;
 
-    for(var i = 0; i < connectionInfoObjects.length; i++)
-    {
-        var myConfig = {
-            host : connectionInfoObjects[i].hostInfo,
-            username: uNAME,
-            port: 22,
-            password,
-            tryKeyboard: false
-        }
+    // for(var i = 0; i < connectionInfoObjects.length; i++)
+    // {
+    //     var myConfig = {
+    //         host : connectionInfoObjects[i].hostInfo,
+    //         username: uNAME,
+    //         port: 22,
+    //         password,
+    //         tryKeyboard: false
+    //     }
         
-        const cnInfo = connectionInfoObjects[i];
+    //     const cnInfo = connectionInfoObjects[i];
 
-        connectionInfoObjects[i].selfSsh.connect(myConfig).then(function(){
-            cnInfo.outputLog += "Connection Established\n";
-            sshLogObject.value = workingDomain.outputLog;
-        });
-    }
+    //     connectionInfoObjects[i].selfSsh.connect(myConfig).then(function(){
+    //         cnInfo.outputLog += "Connection Established\n";
+    //         sshLogObject.value = workingDomain.outputLog;
+    //     });
+    // }
     
     setTimeout(ShellExecutor, 3000);
     commandDisplayer.innerHTML = "%" + 0;
 }
 
-function selam()
-{
-    return 15;
-}
-
 var PreLoad = function(contentState)
 {
-    if(contentState.pageContentState["SSHMethod"] == undefined)
+    var pathContainer = document.getElementById("textContainer");
+    var ourPaths = pathContainer.children;
+    var logText = document.getElementById("logMessage");
+
+    contentState.pageContentState["PathInput"] = new Array();
+
+    for(var i = 0; i < ourPaths.length; i++)
     {
+        if(ourPaths[i].value == "")
+        {
+            logText.style.display = "block";
+            return 1;
+        }
+        contentState.pageContentState["PathInput"].push(ourPaths[i].value);
+    }
+
+    if(contentState.pageContentState["RemoteControlObject"].connectedCount != contentState.pageContentState["RemoteControlObject"].remoteMachines.length)
+    {
+        console.log("One or more remote machines are unreachable");
         return 1;
-    }
-
-    if(contentState.pageContentState["SSHMethod"] == 0)
-    {
-        var sshUser = document.getElementById("sshUsername");
-        var sshPass = document.getElementById("sshPassword");
-        var logSection = document.getElementById("logMessage");
-
-        if(sshUser.value == "")
-        {
-            logSection.innerHTML = "*Name field can not be blank";
-            logSection.style.display = "block";
-            return 1;
-        }
-
-        if(sshPass.value == "")
-        {
-            logSection.innerHTML = "*Password field can not be blank";
-            logSection.style.display = "block";
-            return 1;
-        }
-        contentState.pageContentState["SSHUsername"] = sshUser.value;
-        contentState.pageContentState["SSHPassword"] = sshPass.value;
-    }
-
-    else
-    {
-        var keyLocation = document.getElementById("keyFileInput").files[0];
-        if(keyLocation == "")
-        {
-            logSection.innerHTML = "*Key file must be supplied";
-            logSection.style.display = "block";
-            return 1;
-        }
-
-        var fReader = new FileReader();
-        fReader.readAsBinaryString(document.getElementById("keyFileInput").files[0]);
-        contentState.pageContentState["SSHFile"] = keyLocation;
     }
 
     return 0;

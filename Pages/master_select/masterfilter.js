@@ -1,45 +1,49 @@
-const { NodeSSH } = require("node-ssh");
-
 var PreLoad = function(contentState)
 {
     // If it returns 0
     // We can proceed
     
-    let logViewer = document.getElementById("logMessage");
-    let domainContainer = document.getElementById("textContainer");
-    let inputDomains = domainContainer.children;
-
-    if(contentState.pageContentState["RemoteControlObject"] != undefined)
+    if(contentState.pageContentState["SSHMethod"] == undefined)
     {
-        clearInterval(contentState.pageContentState["RemoteControlObject"].intervalInstance);
-        contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((remoteObjInstance) => {
-            // DISCONNECT IF CONNECTED
-            remoteObjInstance.selfSsh.dispose();
-        })
+        return 1;
     }
 
-    contentState.pageContentState["DomainInputs"] = new Array();
-    contentState.pageContentState["RemoteControlObject"] = {remoteMachines: new Array(), connectedCount: 0, intervalInstance: -1};
-
-    for(var i = 0; i < inputDomains.length; i++)
+    if(contentState.pageContentState["SSHMethod"] == 0)
     {
-        if(contentState.pageContentState["DomainInputs"].indexOf(inputDomains[i].value) !== -1)
+        var sshUser = document.getElementById("sshUsername");
+        var sshPass = document.getElementById("sshPassword");
+        var logSection = document.getElementById("logMessage");
+
+        if(sshUser.value == "")
         {
-            logViewer.innerHTML = "*Domain fields can not be same";
-            logViewer.style.display = "block";
+            logSection.innerHTML = "*Name field can not be blank";
+            logSection.style.display = "block";
             return 1;
         }
-        if(inputDomains[i].value == "")
+
+        if(sshPass.value == "")
         {
-            logViewer.innerHTML = "*Domain fields can not be blank";
-            logViewer.style.display = "block";
+            logSection.innerHTML = "*Password field can not be blank";
+            logSection.style.display = "block";
             return 1;
         }
-        const tempNode = new NodeSSH();
-        
-        let remoteObject = {selfSsh : tempNode, hostInfo: inputDomains[i].value, outputLog : "", cmdIndex : 0};
-        contentState.pageContentState["RemoteControlObject"].remoteMachines.push(remoteObject);
-        contentState.pageContentState["DomainInputs"].push(inputDomains[i].value);
+        contentState.pageContentState["SSHUsername"] = sshUser.value;
+        contentState.pageContentState["SSHPassword"] = sshPass.value;
+    }
+
+    else
+    {
+        var keyLocation = document.getElementById("keyFileInput").files[0];
+        if(keyLocation == "")
+        {
+            logSection.innerHTML = "*Key file must be supplied";
+            logSection.style.display = "block";
+            return 1;
+        }
+
+        var fReader = new FileReader();
+        fReader.readAsBinaryString(document.getElementById("keyFileInput").files[0]);
+        contentState.pageContentState["SSHFile"] = keyLocation;
     }
 
     contentState.pageContentState["RemoteControlObject"].intervalInstance = setInterval(() => {
@@ -49,8 +53,8 @@ var PreLoad = function(contentState)
             return 1;
         }
         contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((remoteObjInstance) => {
-            const remoteUname = 'root';
-            const remotePass = '1234';
+            const remoteUname = contentState.pageContentState["SSHUsername"];
+            const remotePass = contentState.pageContentState["SSHPassword"];
             const myConfig = {
                 host : remoteObjInstance.hostInfo,
                 username: remoteUname,

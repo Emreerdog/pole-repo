@@ -9,6 +9,10 @@
 			"content" : "./Pages/domain_select/domain_select.html"
 		},
 		{
+			"filter" : "./Pages/name_select/namefilter.js",
+			"content" : "./Pages/name_select/name_select.html"
+		},
+		{
 			"filter" : "./Pages/master_select/masterfilter.js",
 			"content" : "./Pages/master_select/masterselect.html"
 		},
@@ -23,10 +27,6 @@
 		{
 			"filter" : "./Pages/path_select/pathfilter.js",
 			"content" : "./Pages/path_select/path_select.html"
-		},
-		{
-			"filter" : "./Pages/name_select/namefilter.js",
-			"content" : "./Pages/name_select/name_select.html"
 		},
 		{
 			"filter" : "./Pages/installation_part/installfilter.js",
