@@ -24,7 +24,7 @@ var OnLoad = function(contentState)
 {
     var factor = 0;
     const netlib = require("net");
-    
+
     const lifeServices = contentState.pageContentState["LifeCheckServices"];
     let countServices = 0;
     for(var i = 0; i < lifeServices.length; i++)
@@ -37,18 +37,17 @@ var OnLoad = function(contentState)
         {
             let newText = document.createElement("small");
             newText.innerHTML = "&#x1F534 " + lifeServices[i].openServices[j].service + " (PORT: " + lifeServices[i].openServices[j].port + ")<br>";
+            lifeServices[i].openServices[j].service_index = countServices + j;
             newText.id = "control" + (countServices + j);
             ourElement.appendChild(newText);
         }
         countServices += lifeServices[i].openServices.length;
     }
 
-    countServices = 0;
+    //countServices = 0;
     for(var i = 0; i < lifeServices.length; i++)
     {
-        
         const compIndex = i;
-        
         for(var j = 0; j < lifeServices[i].openServices.length; j++)
         { 
             
@@ -57,14 +56,27 @@ var OnLoad = function(contentState)
             // console.log(lifeServices[i].openServices[serviceIndex]);
             // console.log(lifeServices[compIndex].openServices[serviceIndex]);
             const connectConfig = {host: lifeServices[compIndex].hostMachine, port: lifeServices[compIndex].openServices[serviceIndex].port};
-            const newVal = serviceIndex + countServices
+            // const newVal = serviceIndex + countServices
             const newSocket = netlib.connect(connectConfig);
             newSocket.on("connect", () => {
-              document.getElementById("control" + newVal).innerHTML = "&#128994 " + lifeServices[compIndex].openServices[serviceIndex].service + " PORT(" + lifeServices[compIndex].openServices[serviceIndex].port + ")<br>";
+              lifeServices[compIndex].openServices[serviceIndex].connected = true;
+              document.getElementById("control" + lifeServices[compIndex].openServices[serviceIndex].service_index).innerHTML = "&#128994 " + lifeServices[compIndex].openServices[serviceIndex].service + " PORT(" + lifeServices[compIndex].openServices[serviceIndex].port + ")<br>";
+            });
+            newSocket.on("error", () => {
+              for(var k = 0; k < contentState.pageContentState["SSHConnectionInstances"].length; k++)
+              {
+                contentState.pageContentState["SSHConnectionInstances"][k].selfSsh.execCommand(lifeServices[compIndex].openServices[serviceIndex].system_cmd).then(function(resultCommand){
+                    const mySocket = netlib.connect({host: lifeServices[compIndex].hostMachine, port: lifeServices[compIndex].openServices[serviceIndex].port});
+                    mySocket.on("connect", () => {
+                      lifeServices[compIndex].openServices[serviceIndex].connected = true;
+                      document.getElementById("control" + lifeServices[compIndex].openServices[serviceIndex].service_index).innerHTML = "&#128994 " + lifeServices[compIndex].openServices[serviceIndex].service + " PORT(" + lifeServices[compIndex].openServices[serviceIndex].port + ")<br>";
+                    })
+                })
+              }
             })  
         }
         
-        countServices += lifeServices[i].openServices.length;
+        //countServices += lifeServices[i].openServices.length;
     }
 }
 

@@ -17,9 +17,10 @@ var PreLoad = function(contentState)
     }
 
     contentState.pageContentState["LifeCheckServices"] = new Array();
-
+    let countServices = 0;
     for(var i = 0; i < contentState.pageContentState["DomainInputs"].length; i++)
     {
+
         let topArray = new Array();
         let lifeCheckObject = {hostMachine: contentState.pageContentState["DomainInputs"][i], openServices : topArray};
         for(var j = 0; j < contentState.pageContentState["ComponentList"].component_configurations.length; j++)
@@ -34,7 +35,7 @@ var PreLoad = function(contentState)
                 {
                     for(var k = 0; k < contentState.pageContentState["ComponentList"].component_configurations[j].service_list.length; k++)
                     {
-                        let myObject = {service: contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].service, port: contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].port};
+                        let myObject = {service: contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].service, port: contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].port, system_cmd: contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].system_cmd, connected: false, service_index: -1};
                         contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k]
                         if(contentState.pageContentState["ComponentList"].component_configurations[j].service_list[k].level == 1)
                         {
@@ -58,11 +59,12 @@ var PreLoad = function(contentState)
         }
         //lifeCheckObject.openServices.push(contentState.pageContentState["ComponentList"].default_services);
         contentState.pageContentState["LifeCheckServices"].push(lifeCheckObject);
+        countServices++;
     }
 
     const lastHostIndex = contentState.pageContentState["LifeCheckServices"].length - 1;
-    contentState.pageContentState["LifeCheckServices"][lastHostIndex].openServices.push({service: "Prometheus", port: 9090});
-    contentState.pageContentState["LifeCheckServices"][lastHostIndex].openServices.push({service: "Grafana", port: 3000});
+    contentState.pageContentState["LifeCheckServices"][lastHostIndex].openServices.push({service: "Prometheus", port: 9090, system_cmd: "", connected: false});
+    contentState.pageContentState["LifeCheckServices"][lastHostIndex].openServices.push({service: "Grafana", port: 3000, system_cmd: "", connected: false});
     console.log(contentState.pageContentState["LifeCheckServices"]);
 
     for(var i = 0; i < contentState.pageContentState["ComponentList"].component_configurations.length; i++)

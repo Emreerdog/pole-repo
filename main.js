@@ -14,7 +14,6 @@ const createWindow = () => {
     })
     
     win.openDevTools();
-    win.maximize();
     win.setResizable(false);
     win.loadFile('index.html');
     win.setMenu(null);
@@ -22,6 +21,5 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
     createWindow();
-    
 })
   

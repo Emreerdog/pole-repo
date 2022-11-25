@@ -228,6 +228,8 @@ function StartRemoteInstallation()
     myContentState.ButtonSetState("next", true);
     myContentState.SetButtonText("Check");
     
+    myContentState.pageContentState["SSHConnectionInstances"] = connectionInfoObjects;
+
     for(var i = 0; i < connectionInfoObjects.length; i++)
     {
         var myConfig = {
@@ -248,6 +250,11 @@ function StartRemoteInstallation()
     
     setTimeout(ShellExecutor, 3000);
     commandDisplayer.innerHTML = "%" + 0;
+}
+
+function selam()
+{
+    return 15;
 }
 
 var PreLoad = function(contentState)
@@ -294,6 +301,7 @@ var PreLoad = function(contentState)
         fReader.readAsBinaryString(document.getElementById("keyFileInput").files[0]);
         contentState.pageContentState["SSHFile"] = keyLocation;
     }
+
     return 0;
 }
 
@@ -452,7 +460,6 @@ var OnLoad = function(contentState)
     fs.writeFileSync("prometheus.yml", yamlModule.dump(doc, {flowLevel: 5}));
     // console.log(prometheusCommand);
     // console.log(longGrafanaCommand);
-
     promSSHInstance.connect(sshConfig).then(function(){
         console.log("connected.");
         promSSHInstance.putFile("prometheus.yml", "/etc/prometheus/prometheus.yml");
