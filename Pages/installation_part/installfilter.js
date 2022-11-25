@@ -285,7 +285,6 @@ function PromExecuteRecursive()
 {
     if(promCounter == sshCommandList.length)
     {
-        promSSHInstance.dispose();
         StartRemoteInstallation();
     }
     else
