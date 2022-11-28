@@ -242,7 +242,7 @@ var PreLoad = function(contentState)
         contentState.pageContentState["PathInput"].push(ourPaths[i].value);
     }
 
-    if(contentState.pageContentState["DeadMachines"].size == 0)
+    if(contentState.pageContentState["DeadMachines"].size != 0)
     {
         let hostText = "Host ";
         let machineSequence = "";
@@ -264,6 +264,8 @@ var PreLoad = function(contentState)
         "- Configured host names properly. \n" +
         "- SSH Service Available. \n" +
         "- Allowed SSH Port (22).";
+
+        contentState.pageContentState["DeadMachines"] = new Set();
 
         const {ipcRenderer} = require("electron");
         ipcRenderer.invoke("pole-error-dialog", "Remote Connection Error", totalErrorMessage);

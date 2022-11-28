@@ -75,7 +75,7 @@ var PreLoad = function(contentState)
                 })
             })
         })
-    }, 1000);
+    }, 500);
 
     return 0;
 }

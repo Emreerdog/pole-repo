@@ -11,6 +11,7 @@
     "make": "electron-forge make",
     "pole": "electron ."
   },
+  
   "author": "Erdog, Abbasoglu",
   "license": "ISC",
   "devDependencies": {
@@ -33,5 +34,27 @@
     "node-ssh": "^13.0.0",
     "popper.js": "^1.16.1",
     "yaml": "^2.1.3"
+  },
+  "config": 
+  {
+    "forge":
+    {
+      "packagerConfig" : 
+      {
+          "icon" : "C:\\Users\\kerem\\Desktop\\polepos\\pole-repo\\icon.ico"
+      },
+      "makers" : 
+      [
+          {
+              "name": "@electron-forge/maker-squirrel",
+              "config" : 
+              {
+                  "name" : "Poleposition",
+                  "icon" : "C:\\Users\\kerem\\Desktop\\polepos\\pole-repo\\icon.ico",
+                  "setupIcon" : "C:\\Users\\kerem\\Desktop\\polepos\\pole-repo\\icon.ico"
+              }
+          }
+      ]
+    }
   }
 }
