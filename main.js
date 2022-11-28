@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require("path");
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -10,14 +10,28 @@ const createWindow = () => {
         nodeIntegration: true,
         contextIsolation: false,
       },
-      icon: './icon.png'
+      icon: './resources/app/icon.png'
     })
-    
+
+    ipcMain.handle("pole-error-dialog", (e, title, msg) => {
+      const dialogOptions = {
+          message: msg,
+          title: title,
+          type: "error"
+      };
+        dialog.showMessageBoxSync(win, dialogOptions);
+    });
+
+    ipcMain.handle("pole-app-close", (e) => {
+      win.close();
+    })
     win.openDevTools();
     win.setResizable(false);
     win.loadFile('index.html');
     win.setMenu(null);
 }
+
+
 
 app.whenReady().then(() => {
     createWindow();

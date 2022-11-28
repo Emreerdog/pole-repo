@@ -1,3 +1,5 @@
+const { ipcRenderer } = require("electron");
+
 var totalDomainInputs;
 var sshCommandList;
 var globalCommandCounter;
@@ -17,9 +19,9 @@ function RemainingPercentage()
 }
 
 function UpdatePercentage() {
-    const totalLength = (sshCommandList.length * totalDomainInputs.length);
+    
     document.getElementById("installProgress").style.width = RemainingPercentage() + '%';
-    document.getElementById("cmdDisplayer").innerHTML = '%' + RemainingPercentage();
+    document.getElementById("cmdDisplayer").innerHTML = '%' + Math.floor(RemainingPercentage());
 } 
 
 function LogSelection()
@@ -46,14 +48,14 @@ function ExecuteRecursive(connectionInstance)
     connectionInstance.selfSsh.execCommand(sshCommandList[connectionInstance.cmdIndex]).then(function(cmdResult){
 
         if(cmdResult.stdout != "")
-            {
-                connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
-            }
+        {
+            connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
+        }
 
-            if(cmdResult.stderr != "")
-            {
-                connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
-            }
+        if(cmdResult.stderr != "")
+        {
+            connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
+        }
 
         globalCommandCounter++;
         UpdatePercentage();
@@ -209,18 +211,6 @@ function StartRemoteInstallation()
         domainSelector.appendChild(newOption);
     });
 
-    // for(var i = 0; i < totalDomainInputs.length; i++)
-    // {
-    //     var sshInstance = new NodeSSH();
-    //     var newConnectionInformation = {selfSsh : sshInstance, isFinished : false, hostInfo : totalDomainInputs[i], outputLog: "", cmdIndex: 0, connIndex: 0};
-    //     connectionInfoObjects.push(newConnectionInformation);
-    //     newConnectionInformation.connIndex = i;
-
-    //     var newOption = document.createElement("option");
-    //     newOption.innerHTML = newConnectionInformation.hostInfo;
-    //     domainSelector.appendChild(newOption);
-    // }
-
     workingDomain = connectionInfoObjects[0];
 
     const uNAME = myContentState.pageContentState["SSHUsername"];
@@ -232,24 +222,6 @@ function StartRemoteInstallation()
     
     myContentState.pageContentState["SSHConnectionInstances"] = connectionInfoObjects;
 
-    // for(var i = 0; i < connectionInfoObjects.length; i++)
-    // {
-    //     var myConfig = {
-    //         host : connectionInfoObjects[i].hostInfo,
-    //         username: uNAME,
-    //         port: 22,
-    //         password,
-    //         tryKeyboard: false
-    //     }
-        
-    //     const cnInfo = connectionInfoObjects[i];
-
-    //     connectionInfoObjects[i].selfSsh.connect(myConfig).then(function(){
-    //         cnInfo.outputLog += "Connection Established\n";
-    //         sshLogObject.value = workingDomain.outputLog;
-    //     });
-    // }
-    
     setTimeout(ShellExecutor, 3000);
     commandDisplayer.innerHTML = "%" + 0;
 }
@@ -274,7 +246,29 @@ var PreLoad = function(contentState)
 
     if(contentState.pageContentState["RemoteControlObject"].connectedCount != contentState.pageContentState["RemoteControlObject"].remoteMachines.length)
     {
-        console.log("One or more remote machines are unreachable");
+        let hostText = "Host ";
+        let machineSequence = "";
+
+        if(contentState.pageContentState["DeadMachines"].size > 1)
+        {
+            hostText = "Hosts ";
+        }
+
+        for(let hostKey of contentState.pageContentState["DeadMachines"])
+        {
+            machineSequence += hostKey + "\n";
+        }
+
+        const totalErrorMessage = hostText + " unreachable: \n" +
+        machineSequence +
+        "\n Make sure you have: \n"+
+        "- Properly working internet connection. \n" +
+        "- Configured host names properly. \n" +
+        "- SSH Service Available. \n" +
+        "- Allowed SSH Port (22).";
+
+        const {ipcRenderer} = require("electron");
+        ipcRenderer.invoke("pole-error-dialog", "Remote Connection Error", totalErrorMessage);
         return 1;
     }
 
@@ -325,7 +319,7 @@ var OnLoad = function(contentState)
     const promMaster = totalDomainInputs[totalDomainInputs.length - 1];
 
     const fs = require('fs');
-    const doc = yamlModule.load(fs.readFileSync('prometheus_template.yml', 'utf8'));
+    const doc = yamlModule.load(fs.readFileSync('./resources/app/prometheus_template.yml', 'utf8'));
 
     doc.scrape_configs[0].static_configs[0].targets[0] = promMaster + ":9090";
     doc.scrape_configs[3].static_configs[0].targets[0] = myContentState.pageContentState["MasterNode"] + ":27001";
@@ -434,7 +428,7 @@ var OnLoad = function(contentState)
     
     fs.writeFileSync("prometheus.yml", yamlModule.dump(doc, {flowLevel: 5}));
     
-    promSSHInstance.putFile("prometheus.yml", "/etc/prometheus/prometheus.yml");
+    promSSHInstance.putFile("./resources/app/prometheus.yml", "/etc/prometheus/prometheus.yml");
 
     // promSSHInstance.connect(sshConfig).then(function(){
     //     console.log("connected.");

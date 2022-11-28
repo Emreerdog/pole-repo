@@ -4,19 +4,28 @@
   "description": "Remake of poleposition without react",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron-forge start",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deneme": "bower install bootstrap"
+    "deneme": "bower install bootstrap",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "pole": "electron ."
   },
   "author": "Erdog, Abbasoglu",
   "license": "ISC",
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.3",
+    "@electron-forge/maker-deb": "^6.0.3",
+    "@electron-forge/maker-rpm": "^6.0.3",
+    "@electron-forge/maker-squirrel": "^6.0.3",
+    "@electron-forge/maker-zip": "^6.0.3",
     "electron": "^21.1.1",
     "path": "^0.12.7"
   },
   "dependencies": {
     "bootstrap": "^5.2.2",
     "bower": "^1.8.14",
+    "electron-squirrel-startup": "^1.0.0",
     "fs": "^0.0.1-security",
     "jquery": "^3.6.1",
     "js-yaml": "^4.1.0",

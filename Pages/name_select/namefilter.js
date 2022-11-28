@@ -16,6 +16,7 @@ var PreLoad = function(contentState)
     }
 
     contentState.pageContentState["DomainInputs"] = new Array();
+    contentState.pageContentState["DeadMachines"] = new Set();
     contentState.pageContentState["RemoteControlObject"] = {remoteMachines: new Array(), connectedCount: 0, intervalInstance: -1};
 
     for(var i = 0; i < inputDomains.length; i++)

@@ -50,13 +50,8 @@ var OnLoad = function(contentState)
         const compIndex = i;
         for(var j = 0; j < lifeServices[i].openServices.length; j++)
         { 
-            
             const serviceIndex = j;
-            // console.log(serviceIndex);
-            // console.log(lifeServices[i].openServices[serviceIndex]);
-            // console.log(lifeServices[compIndex].openServices[serviceIndex]);
             const connectConfig = {host: lifeServices[compIndex].hostMachine, port: lifeServices[compIndex].openServices[serviceIndex].port};
-            // const newVal = serviceIndex + countServices
             const newSocket = netlib.connect(connectConfig);
             newSocket.on("connect", () => {
               lifeServices[compIndex].openServices[serviceIndex].connected = true;

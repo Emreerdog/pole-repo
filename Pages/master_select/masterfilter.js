@@ -67,13 +67,15 @@ var PreLoad = function(contentState)
                 contentState.pageContentState["RemoteControlObject"].connectedCount++;
             }, (err) => {
                 console.log(err);
+                console.log(contentState.pageContentState["DeadMachines"]);
+                contentState.pageContentState["DeadMachines"].add(remoteObjInstance.hostInfo);
                 contentState.pageContentState["RemoteControlObject"].connectedCount = 0;
                 contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((newRemoteObj) => {
                     newRemoteObj.selfSsh.dispose();
                 })
             })
         })
-    }, 2000);
+    }, 1000);
 
     return 0;
 }
