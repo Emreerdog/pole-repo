@@ -86,10 +86,10 @@ var OnLoad = function(contentState)
 {
     var repoField = document.getElementById("repoUrlText");
     var urlField = document.getElementById("repoUrl");
-
-    urlField.onchange = function () {
-        repoField.value = urlField.value;
-    }
+    contentState.pageContentState["SelectedUrl"] = undefined;
+    // urlField.onchange = function () {
+    //     repoField.value = urlField.value;
+    // }
 
     var advanceCheck = document.getElementById("advanceCheck");
 
@@ -98,7 +98,6 @@ var OnLoad = function(contentState)
         if(contentState.pageContentState["AdvanceChecked"] == true)
         {
             repoField.style.display = "block";
-            repoField.value = urlField.value;
         }
 
         else
