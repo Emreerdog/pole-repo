@@ -1,5 +1,3 @@
-const { ipcRenderer } = require("electron");
-
 var totalDomainInputs;
 var sshCommandList;
 var globalCommandCounter;
@@ -244,7 +242,7 @@ var PreLoad = function(contentState)
         contentState.pageContentState["PathInput"].push(ourPaths[i].value);
     }
 
-    if(contentState.pageContentState["RemoteControlObject"].connectedCount != contentState.pageContentState["RemoteControlObject"].remoteMachines.length)
+    if(contentState.pageContentState["DeadMachines"].size == 0)
     {
         let hostText = "Host ";
         let machineSequence = "";

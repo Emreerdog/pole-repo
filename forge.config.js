@@ -1,16 +1,17 @@
 module.exports = {
   
   rebuildConfig: {},
+  config: {
+    forge: {
+        packagerConfig: {
+            icon: 'C:\\Users\\kerem\\Desktop\\polepos\\pole-repo\\life.ico'
+        }
+    }
+  },
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {
-        forge: {
-            packagerConfig: {
-                icon: './icon'
-            }
-        }
-      }
+      config: {}
     },
     {
       name: '@electron-forge/maker-zip',

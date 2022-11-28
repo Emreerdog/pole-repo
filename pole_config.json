@@ -35,6 +35,10 @@
 		{
 			"filter" : "./Pages/life_check/lifecheck.js",
 			"content" : "./resources/app/Pages/life_check/life_check.html"
+		},
+		{
+			"filter" : "./Pages/end_page/end_page.js",
+			"content" : "./resources/app/Pages/end_page/end_page.html"
 		}
 	]
 
