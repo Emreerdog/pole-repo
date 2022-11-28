@@ -38,7 +38,8 @@ var OnLoad = function(contentState)
         newPath.className = "w-100 mb-1";
         newPath.id = "pathInput" + ourPaths.length;
         newPath.placeholder = "/home/data/" + ourPaths.length;
-    })
+        pathContainer.appendChild(newPath);
+    });
 
     removePathButton.addEventListener('click', () => {
         // Do not remove the last input
@@ -46,7 +47,8 @@ var OnLoad = function(contentState)
         {
             pathContainer.removeChild(pathContainer.lastChild);
         }
-    })
+    });
+    contentState.SetButtonText("Install");
 }
 
 var exportFunctions = [PreLoad, OnLoad];

@@ -1,46 +1,81 @@
-function checkForDuplicates(array) {
-    let valuesAlreadySeen = []
-  
-    for (let i = 0; i < array.length; i++) {
-      let value = array[i]
-      if (valuesAlreadySeen.indexOf(value) !== -1) {
-        return true
-      }
-      valuesAlreadySeen.push(value)
-    }
-    return false
-  }
-  
-
 var PreLoad = function(contentState)
 {
-    var returnValue = 0;
     // If it returns 0
     // We can proceed
     
-    var logViewer = document.getElementById("logMessage");
-    var domainContainer = document.getElementById("textContainer");
-    var inputDomains = domainContainer.children;
-    var inputDomainscheck = domainContainer.children;
-
-    contentState.pageContentState["DomainInputs"] = new Array();
-
-    for(var i = 0; i < inputDomains.length; i++)
+    if(contentState.pageContentState["SSHMethod"] == undefined)
     {
-        if(contentState.pageContentState["DomainInputs"].indexOf(inputDomains[i].value) !== -1)
-        {
-            logViewer.innerHTML = "*Domain fields can not be same";
-            logViewer.style.display = "block";
-            return 1;
-        }
-        if(inputDomains[i].value == "")
-        {
-            logViewer.innerHTML = "*Domain fields can not be blank";
-            logViewer.style.display = "block";
-            return 1;
-        }
-        contentState.pageContentState["DomainInputs"].push(inputDomains[i].value);
+        return 1;
     }
+
+    if(contentState.pageContentState["SSHMethod"] == 0)
+    {
+        var sshUser = document.getElementById("sshUsername");
+        var sshPass = document.getElementById("sshPassword");
+        var logSection = document.getElementById("logMessage");
+
+        if(sshUser.value == "")
+        {
+            logSection.innerHTML = "*Name field can not be blank";
+            logSection.style.display = "block";
+            return 1;
+        }
+
+        if(sshPass.value == "")
+        {
+            logSection.innerHTML = "*Password field can not be blank";
+            logSection.style.display = "block";
+            return 1;
+        }
+        contentState.pageContentState["SSHUsername"] = sshUser.value;
+        contentState.pageContentState["SSHPassword"] = sshPass.value;
+    }
+
+    else
+    {
+        var keyLocation = document.getElementById("keyFileInput").files[0];
+        if(keyLocation == "")
+        {
+            logSection.innerHTML = "*Key file must be supplied";
+            logSection.style.display = "block";
+            return 1;
+        }
+
+        var fReader = new FileReader();
+        fReader.readAsBinaryString(document.getElementById("keyFileInput").files[0]);
+        contentState.pageContentState["SSHFile"] = keyLocation;
+    }
+
+    contentState.pageContentState["RemoteControlObject"].intervalInstance = setInterval(() => {
+        if(contentState.pageContentState["RemoteControlObject"].connectedCount == contentState.pageContentState["RemoteControlObject"].remoteMachines.length)
+        {
+            clearInterval(contentState.pageContentState["RemoteControlObject"].intervalInstance);
+            return 1;
+        }
+        contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((remoteObjInstance) => {
+            const remoteUname = contentState.pageContentState["SSHUsername"];
+            const remotePass = contentState.pageContentState["SSHPassword"];
+            const myConfig = {
+                host : remoteObjInstance.hostInfo,
+                username: remoteUname,
+                port: 22,
+                password: remotePass,
+                tryKeyboard : false
+            };
+            
+            remoteObjInstance.selfSsh.connect(myConfig).then(() => {
+                contentState.pageContentState["RemoteControlObject"].connectedCount++;
+            }, (err) => {
+                console.log(err);
+                console.log(contentState.pageContentState["DeadMachines"]);
+                contentState.pageContentState["DeadMachines"].add(remoteObjInstance.hostInfo);
+                contentState.pageContentState["RemoteControlObject"].connectedCount = 0;
+                contentState.pageContentState["RemoteControlObject"].remoteMachines.forEach((newRemoteObj) => {
+                    newRemoteObj.selfSsh.dispose();
+                })
+            })
+        })
+    }, 500);
 
     return 0;
 }
@@ -55,13 +90,12 @@ var OnLoad = function(contentState)
         optionElement.value = contentState.pageContentState["DomainInputs"][i];
         optionElement.innerHTML = contentState.pageContentState["DomainInputs"][i];
         masterNodeSelector.appendChild(optionElement);
-        
     }
 
     if(contentState.pageContentState["MasterNode"] != undefined)
-        {
-            masterNodeSelector.value = contentState.pageContentState["MasterNode"];
-        }
+    {
+        masterNodeSelector.value = contentState.pageContentState["MasterNode"];
+    }
 }
 
 var exportFunctions = [PreLoad, OnLoad];

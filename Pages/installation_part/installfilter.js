@@ -1,5 +1,3 @@
-const { NodeSSH } = require("node-ssh");
-
 var totalDomainInputs;
 var sshCommandList;
 var globalCommandCounter;
@@ -19,9 +17,9 @@ function RemainingPercentage()
 }
 
 function UpdatePercentage() {
-    const totalLength = (sshCommandList.length * totalDomainInputs.length);
+    
     document.getElementById("installProgress").style.width = RemainingPercentage() + '%';
-    document.getElementById("cmdDisplayer").innerHTML = '%' + RemainingPercentage();
+    document.getElementById("cmdDisplayer").innerHTML = '%' + Math.floor(RemainingPercentage());
 } 
 
 function LogSelection()
@@ -48,14 +46,14 @@ function ExecuteRecursive(connectionInstance)
     connectionInstance.selfSsh.execCommand(sshCommandList[connectionInstance.cmdIndex]).then(function(cmdResult){
 
         if(cmdResult.stdout != "")
-            {
-                connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
-            }
+        {
+            connectionInstance.outputLog += 'STDOUT: ' + cmdResult.stdout + '\n';
+        }
 
-            if(cmdResult.stderr != "")
-            {
-                connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
-            }
+        if(cmdResult.stderr != "")
+        {
+            connectionInstance.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
+        }
 
         globalCommandCounter++;
         UpdatePercentage();
@@ -88,6 +86,7 @@ function ShellExecutor()
             {
                 cnInfo.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
             }
+
             globalCommandCounter++;
             UpdatePercentage();
             sshLogObject.value = workingDomain.outputLog;
@@ -105,8 +104,6 @@ function StartRemoteInstallation()
 
     const givenRepoUrl = myContentState.pageContentState["SelectedUrl"]; // STRING
     const givenMasterNode = myContentState.pageContentState["MasterNode"]; // STRING
-
-    
 
     sshCommandList = new Array();
     globalCommandCounter = 0;
@@ -205,19 +202,13 @@ function StartRemoteInstallation()
     domainSelector.style.display = "block";
     domainSelector.onchange = LogSelection;
 
-    var commandCount = sshCommandList.length * totalDomainInputs.length;
+    connectionInfoObjects = myContentState.pageContentState["RemoteControlObject"].remoteMachines;
 
-    for(var i = 0; i < totalDomainInputs.length; i++)
-    {
-        var sshInstance = new NodeSSH();
-        var newConnectionInformation = {selfSsh : sshInstance, isFinished : false, hostInfo : totalDomainInputs[i], outputLog: "", cmdIndex: 0, connIndex: 0};
-        connectionInfoObjects.push(newConnectionInformation);
-        newConnectionInformation.connIndex = i;
-
+    connectionInfoObjects.forEach((remoteObject) => {
         var newOption = document.createElement("option");
-        newOption.innerHTML = newConnectionInformation.hostInfo;
+        newOption.innerHTML = remoteObject.hostInfo;
         domainSelector.appendChild(newOption);
-    }
+    });
 
     workingDomain = connectionInfoObjects[0];
 
@@ -230,76 +221,56 @@ function StartRemoteInstallation()
     
     myContentState.pageContentState["SSHConnectionInstances"] = connectionInfoObjects;
 
-    for(var i = 0; i < connectionInfoObjects.length; i++)
-    {
-        var myConfig = {
-            host : connectionInfoObjects[i].hostInfo,
-            username: uNAME,
-            port: 22,
-            password,
-            tryKeyboard: false
-        }
-        
-        const cnInfo = connectionInfoObjects[i];
-
-        connectionInfoObjects[i].selfSsh.connect(myConfig).then(function(){
-            cnInfo.outputLog += "Connection Established\n";
-            sshLogObject.value = workingDomain.outputLog;
-        });
-    }
-    
     setTimeout(ShellExecutor, 3000);
     commandDisplayer.innerHTML = "%" + 0;
 }
 
-function selam()
-{
-    return 15;
-}
-
 var PreLoad = function(contentState)
 {
-    if(contentState.pageContentState["SSHMethod"] == undefined)
+    var pathContainer = document.getElementById("textContainer");
+    var ourPaths = pathContainer.children;
+    var logText = document.getElementById("logMessage");
+
+    contentState.pageContentState["PathInput"] = new Array();
+
+    for(var i = 0; i < ourPaths.length; i++)
     {
+        if(ourPaths[i].value == "")
+        {
+            logText.style.display = "block";
+            return 1;
+        }
+        contentState.pageContentState["PathInput"].push(ourPaths[i].value);
+    }
+
+    if(contentState.pageContentState["DeadMachines"].size != 0)
+    {
+        let hostText = "Host ";
+        let machineSequence = "";
+
+        if(contentState.pageContentState["DeadMachines"].size > 1)
+        {
+            hostText = "Hosts ";
+        }
+
+        for(let hostKey of contentState.pageContentState["DeadMachines"])
+        {
+            machineSequence += hostKey + "\n";
+        }
+
+        const totalErrorMessage = hostText + " unreachable: \n" +
+        machineSequence +
+        "\n Make sure you have: \n"+
+        "- Properly working internet connection. \n" +
+        "- Configured host names properly. \n" +
+        "- SSH Service Available. \n" +
+        "- Allowed SSH Port (22).";
+
+        contentState.pageContentState["DeadMachines"] = new Set();
+
+        const {ipcRenderer} = require("electron");
+        ipcRenderer.invoke("pole-error-dialog", "Remote Connection Error", totalErrorMessage);
         return 1;
-    }
-
-    if(contentState.pageContentState["SSHMethod"] == 0)
-    {
-        var sshUser = document.getElementById("sshUsername");
-        var sshPass = document.getElementById("sshPassword");
-        var logSection = document.getElementById("logMessage");
-
-        if(sshUser.value == "")
-        {
-            logSection.innerHTML = "*Name field can not be blank";
-            logSection.style.display = "block";
-            return 1;
-        }
-
-        if(sshPass.value == "")
-        {
-            logSection.innerHTML = "*Password field can not be blank";
-            logSection.style.display = "block";
-            return 1;
-        }
-        contentState.pageContentState["SSHUsername"] = sshUser.value;
-        contentState.pageContentState["SSHPassword"] = sshPass.value;
-    }
-
-    else
-    {
-        var keyLocation = document.getElementById("keyFileInput").files[0];
-        if(keyLocation == "")
-        {
-            logSection.innerHTML = "*Key file must be supplied";
-            logSection.style.display = "block";
-            return 1;
-        }
-
-        var fReader = new FileReader();
-        fReader.readAsBinaryString(document.getElementById("keyFileInput").files[0]);
-        contentState.pageContentState["SSHFile"] = keyLocation;
     }
 
     return 0;
@@ -309,7 +280,6 @@ function PromExecuteRecursive()
 {
     if(promCounter == sshCommandList.length)
     {
-        promSSHInstance.dispose();
         StartRemoteInstallation();
     }
     else
@@ -350,7 +320,7 @@ var OnLoad = function(contentState)
     const promMaster = totalDomainInputs[totalDomainInputs.length - 1];
 
     const fs = require('fs');
-    const doc = yamlModule.load(fs.readFileSync('prometheus_template.yml', 'utf8'));
+    const doc = yamlModule.load(fs.readFileSync('./resources/app/prometheus_template.yml', 'utf8'));
 
     doc.scrape_configs[0].static_configs[0].targets[0] = promMaster + ":9090";
     doc.scrape_configs[3].static_configs[0].targets[0] = myContentState.pageContentState["MasterNode"] + ":27001";
@@ -373,8 +343,8 @@ var OnLoad = function(contentState)
     {
         doc.scrape_configs[4].static_configs[0].targets.push(totalDomainInputs[i] + ":27002");
     }
-
-    promSSHInstance = new NodeSSH();
+    const lastMachine = contentState.pageContentState["RemoteControlObject"].remoteMachines.length;
+    promSSHInstance = contentState.pageContentState["RemoteControlObject"].remoteMachines[lastMachine - 1].selfSsh;
     
     const uNAME = myContentState.pageContentState["SSHUsername"];
     const password = myContentState.pageContentState["SSHPassword"];
@@ -449,21 +419,22 @@ var OnLoad = function(contentState)
     sshCommandList.push("sudo firewall-cmd --reload");    
 
 
-    var sshConfig = {
-        host: promMaster,
-        username: uNAME,
-        port: 22,
-        password,
-        tryKeyboard: false
-    }
+    // var sshConfig = {
+    //     host: promMaster,
+    //     username: uNAME,
+    //     port: 22,
+    //     password,
+    //     tryKeyboard: false
+    // }
     
     fs.writeFileSync("prometheus.yml", yamlModule.dump(doc, {flowLevel: 5}));
-    // console.log(prometheusCommand);
-    // console.log(longGrafanaCommand);
-    promSSHInstance.connect(sshConfig).then(function(){
-        console.log("connected.");
-        promSSHInstance.putFile("prometheus.yml", "/etc/prometheus/prometheus.yml");
-    })
+    
+    promSSHInstance.putFile("./resources/app/prometheus.yml", "/etc/prometheus/prometheus.yml");
+
+    // promSSHInstance.connect(sshConfig).then(function(){
+    //     console.log("connected.");
+    //     promSSHInstance.putFile("prometheus.yml", "/etc/prometheus/prometheus.yml");
+    // })
 
     setTimeout(PromExecuteRecursive, 3000);
     myContentState.ButtonSetState("back", true);

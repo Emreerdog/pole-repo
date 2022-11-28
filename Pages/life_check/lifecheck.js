@@ -44,19 +44,16 @@ var OnLoad = function(contentState)
         countServices += lifeServices[i].openServices.length;
     }
 
+    myContentState.SetButtonText("Finish");
+
     //countServices = 0;
     for(var i = 0; i < lifeServices.length; i++)
     {
         const compIndex = i;
         for(var j = 0; j < lifeServices[i].openServices.length; j++)
         { 
-            
             const serviceIndex = j;
-            // console.log(serviceIndex);
-            // console.log(lifeServices[i].openServices[serviceIndex]);
-            // console.log(lifeServices[compIndex].openServices[serviceIndex]);
             const connectConfig = {host: lifeServices[compIndex].hostMachine, port: lifeServices[compIndex].openServices[serviceIndex].port};
-            // const newVal = serviceIndex + countServices
             const newSocket = netlib.connect(connectConfig);
             newSocket.on("connect", () => {
               lifeServices[compIndex].openServices[serviceIndex].connected = true;
@@ -65,13 +62,27 @@ var OnLoad = function(contentState)
             newSocket.on("error", () => {
               for(var k = 0; k < contentState.pageContentState["SSHConnectionInstances"].length; k++)
               {
-                contentState.pageContentState["SSHConnectionInstances"][k].selfSsh.execCommand(lifeServices[compIndex].openServices[serviceIndex].system_cmd).then(function(resultCommand){
-                    const mySocket = netlib.connect({host: lifeServices[compIndex].hostMachine, port: lifeServices[compIndex].openServices[serviceIndex].port});
-                    mySocket.on("connect", () => {
-                      lifeServices[compIndex].openServices[serviceIndex].connected = true;
-                      document.getElementById("control" + lifeServices[compIndex].openServices[serviceIndex].service_index).innerHTML = "&#128994 " + lifeServices[compIndex].openServices[serviceIndex].service + " PORT(" + lifeServices[compIndex].openServices[serviceIndex].port + ")<br>";
-                    })
-                })
+                if(lifeServices[compIndex].openServices[serviceIndex].system_cmd == "")
+                {
+                    // DO NOTHING IF THE SYSTEM CMD IS EMPTY
+                }
+                else
+                {
+                  contentState.pageContentState["SSHConnectionInstances"][k].selfSsh.execCommand(lifeServices[compIndex].openServices[serviceIndex].system_cmd).then(function(resultCommand){
+                    const intervalHandle = setInterval(() => {
+                      const mySocket = netlib.connect({host: lifeServices[compIndex].hostMachine, port: lifeServices[compIndex].openServices[serviceIndex].port});
+                      mySocket.on("connect", () => {
+                        clearInterval(intervalHandle);
+                        lifeServices[compIndex].openServices[serviceIndex].connected = true;
+                        document.getElementById("control" + lifeServices[compIndex].openServices[serviceIndex].service_index).innerHTML = "&#128994 " + lifeServices[compIndex].openServices[serviceIndex].service + " PORT(" + lifeServices[compIndex].openServices[serviceIndex].port + ")<br>";
+                      })
+                      mySocket.on("error", () => {
+                        
+                      })
+                    }, 1000);
+                    
+                  })
+                }
               }
             })  
         }
