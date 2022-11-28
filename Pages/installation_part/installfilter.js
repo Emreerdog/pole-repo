@@ -86,6 +86,7 @@ function ShellExecutor()
             {
                 cnInfo.outputLog += 'STDERR: ' + cmdResult.stderr + '\n';
             }
+
             globalCommandCounter++;
             UpdatePercentage();
             sshLogObject.value = workingDomain.outputLog;

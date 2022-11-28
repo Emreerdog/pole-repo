@@ -25,7 +25,6 @@ const createWindow = () => {
     ipcMain.handle("pole-app-close", (e) => {
       win.close();
     })
-    win.openDevTools();
     win.setResizable(false);
     win.loadFile('index.html');
     win.setMenu(null);
