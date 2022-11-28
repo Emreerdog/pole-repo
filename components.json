@@ -36,16 +36,37 @@
 			"display_state" : true
 		},
 		{
-			"comp_name" : "gpdb",
+			"comp_name" : "spark",
 			"service_list" : 
 			[
 				{
-					"service" : "Gpdb",
-					"port" : 5432,
-					"level" : 0
+					"service" : "",
+					"port" : 0,
+					"level" : 0,
+					"system_cmd" : ""
 				}
 			],
-            "click_state" : false,
+			"click_state" : false,
+			"display_state" : true
+		},
+		{
+			"comp_name" : "hbase",
+			"service_list" : 
+			[
+				{
+					"service": "HMaster",
+					"port" : 16010,
+					"level" : 1,
+					"system_cmd" : "systemctl restart hbase-master.service"
+				},
+				{
+					"service" : "Region Server",
+					"port" : 16030,
+					"level" : 0,
+					"system_cmd" : "systemctl restart hbase-regionserver.service"
+				}
+			],
+			"click_state" : false,
 			"display_state" : true
 		},
 		{
@@ -159,18 +180,6 @@
 					"port" : 8042,
 					"level" : 0,
 					"system_cmd" : "systemctl restart hadoop-yarn-nodemanager.service"
-				},
-				{
-					"service": "HMaster",
-					"port" : 16010,
-					"level" : 1,
-					"system_cmd" : "systemctl restart hbase-master.service"
-				},
-				{
-					"service" : "Region Server",
-					"port" : 16030,
-					"level" : 0,
-					"system_cmd" : "systemctl restart hbase-regionserver.service"
 				}
 			],
 			"click_state" : true,
