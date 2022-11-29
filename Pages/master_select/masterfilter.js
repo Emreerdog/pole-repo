@@ -2,7 +2,7 @@ var PreLoad = function(contentState)
 {
     // If it returns 0
     // We can proceed
-    
+
     if(contentState.pageContentState["SSHMethod"] == undefined)
     {
         return 1;

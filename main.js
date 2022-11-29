@@ -12,26 +12,25 @@ const createWindow = () => {
       },
       icon: './resources/app/icon.png'
     })
-
+    
     ipcMain.handle("pole-error-dialog", (e, title, msg) => {
       const dialogOptions = {
           message: msg,
           title: title,
           type: "error"
       };
+      console.log(e);
         dialog.showMessageBoxSync(win, dialogOptions);
     });
 
     ipcMain.handle("pole-app-close", (e) => {
       win.close();
-    })
+    });
 
     win.setResizable(false);
     win.loadFile('index.html');
     win.setMenu(null);
 }
-
-
 
 app.whenReady().then(() => {
     createWindow();

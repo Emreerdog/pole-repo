@@ -2,7 +2,6 @@ var PreLoad = function(contentState)
 {
     // If it returns 0
     // We can proceed
-
     var urlField;
     var chBox = document.getElementById("advanceCheck");
     if(chBox.checked == true)

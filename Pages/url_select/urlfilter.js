@@ -75,8 +75,6 @@ var PreLoad = function(contentState)
         }
     }
     
-    
-
     var logMsg = document.getElementById("logMessage");
     logMsg.style.display = "block";
     return 1;

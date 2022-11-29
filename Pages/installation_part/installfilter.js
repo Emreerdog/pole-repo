@@ -138,7 +138,7 @@ function StartRemoteInstallation()
     "bigtop::hadoop_head_node: \"" + givenMasterNode + "\"\n"+
     "hadoop::hadoop_storage_dirs:\n"+
     storageDirectories +
-    "hadoop_cluster_node::cluster_components:\n- hdfs-non-ha\n- zookeeper\n- yarn\n"+ componentsString + "- hbase\n" +
+    "hadoop_cluster_node::cluster_components:\n- hdfs-non-ha\n- zookeeper\n- yarn\n"+ componentsString +
     "bigtop::jdk_package_name: \"java-1.8.0-openjdk-devel.x86_64\"\n"+
     "bigtop::bigtop_repo_uri: \"" + givenRepoUrl + "\"\nEOF\n\"";
 
@@ -429,7 +429,7 @@ var OnLoad = function(contentState)
     
     fs.writeFileSync("prometheus.yml", yamlModule.dump(doc, {flowLevel: 5}));
     
-    promSSHInstance.putFile("./resources/app/prometheus.yml", "/etc/prometheus/prometheus.yml");
+    promSSHInstance.putFile("./prometheus.yml", "/etc/prometheus/prometheus.yml");
 
     // promSSHInstance.connect(sshConfig).then(function(){
     //     console.log("connected.");

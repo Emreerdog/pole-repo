@@ -29,17 +29,21 @@ var OnLoad = function(contentState)
     let countServices = 0;
     for(var i = 0; i < lifeServices.length; i++)
     {
+        
         var ourElement = document.getElementById("controlBlock");
         var hostSelect = document.createElement("small");
         hostSelect.innerHTML = "Host (" + lifeServices[i].hostMachine + ")<br>";
         ourElement.appendChild(hostSelect);
         for(var j = 0; j < lifeServices[i].openServices.length; j++)
         {
-            let newText = document.createElement("small");
-            newText.innerHTML = "&#x1F534 " + lifeServices[i].openServices[j].service + " (PORT: " + lifeServices[i].openServices[j].port + ")<br>";
-            lifeServices[i].openServices[j].service_index = countServices + j;
-            newText.id = "control" + (countServices + j);
-            ourElement.appendChild(newText);
+            if(lifeServices[i].openServices[j].port != 0)
+            {
+              let newText = document.createElement("small");
+              newText.innerHTML = "&#x1F534 " + lifeServices[i].openServices[j].service + " (PORT: " + lifeServices[i].openServices[j].port + ")<br>";
+              lifeServices[i].openServices[j].service_index = countServices + j;
+              newText.id = "control" + (countServices + j);
+              ourElement.appendChild(newText);
+            }
         }
         countServices += lifeServices[i].openServices.length;
     }
@@ -53,6 +57,10 @@ var OnLoad = function(contentState)
         for(var j = 0; j < lifeServices[i].openServices.length; j++)
         { 
             const serviceIndex = j;
+            if(lifeServices[compIndex].openServices[serviceIndex].port == 0)
+            {
+                continue;
+            }
             const connectConfig = {host: lifeServices[compIndex].hostMachine, port: lifeServices[compIndex].openServices[serviceIndex].port};
             const newSocket = netlib.connect(connectConfig);
             newSocket.on("connect", () => {
