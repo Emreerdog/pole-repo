@@ -44,7 +44,7 @@ var OnLoad = function(contentState)
         countServices += lifeServices[i].openServices.length;
     }
 
-    myContentState.SetButtonText("Finish");
+    contentState.SetButtonText("Finish");
 
     //countServices = 0;
     for(var i = 0; i < lifeServices.length; i++)

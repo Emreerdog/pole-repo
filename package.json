@@ -53,6 +53,13 @@
                   "icon" : "C:\\Users\\kerem\\Desktop\\polepos\\pole-repo\\icon.ico",
                   "setupIcon" : "C:\\Users\\kerem\\Desktop\\polepos\\pole-repo\\icon.ico"
               }
+          },
+          {
+              "name" : "@electron-forge/maker-rpm",
+              "config" : 
+              {
+                  "name" : "Poleposition"
+              }
           }
       ]
     }
